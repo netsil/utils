@@ -1,7 +1,6 @@
 # CLI Setup on Mac
 Following have been tested on macOS 10.12
 
-* Clone the Netsil Utils repo
 ``` bash 
 git clone https://github.com/netsil/utils.git   #clone netsil utils repo
 ```
