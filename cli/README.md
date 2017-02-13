@@ -3,30 +3,27 @@ Following have been tested on macOS 10.12
 
 * Clone the Netsil Utils repo
 ``` bash 
-git clone https://github.com/netsil/utils.git
+git clone https://github.com/netsil/utils.git   #clone netsil utils repo
 ```
-* Change directory to the cli: cd /your_clone_of_netsil_utisl/cli
-
-* Install virtualenv 
-``` bash 
-sudo pip install virtualenv
-```
-* Create a virtual env in the cli directory 
-```bash 
-virtualenv venv
-```
-
-* Activate virtal env
-```bash
-. venv/bin/activate
-```
-* Run package.sh
-```bash
-source package.sh
-```
-* Test
 ``` bash
-netsil_aoc --help
+cd /your_clone_of_netsil_utisl/cli    #change to the cli directory
+```
+
+``` bash 
+sudo pip install virtualenv        #install virtualenv
+```
+```bash 
+virtualenv venv       #launch a virtual env in the cli/ folder
+```
+
+```bash
+. venv/bin/activate   #Activate virtual env
+```
+```bash
+source package.sh     #Install dependencies and netsil_aoc cli
+```
+``` bash
+netsil_aoc --help     #All set if you see below message
 
 (venv) $ netsil_aoc --help
 Usage: netsil_aoc [OPTIONS] COMMAND [ARGS]...
