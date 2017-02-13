@@ -22,6 +22,11 @@ virtualenv venv       #launch a virtual env in the cli/ folder
 source package.sh     #Install dependencies and netsil_aoc cli
 ```
 ``` bash
+export AOCUSER = <aoc_username>                          #(set your aoc username)
+export AOCPWD  = <aoc_password>                          #(set your aoc password) 
+export AOCURL  = https://your.netsil.url                 #(leave out the end '/')
+```
+``` bash
 netsil_aoc --help     #All set if you see below message
 
 (venv) $ netsil_aoc --help
