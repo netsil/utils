@@ -1,7 +1,0 @@
-netsilaoc.py
-Netsil_AOC.egg-info/PKG-INFO
-Netsil_AOC.egg-info/SOURCES.txt
-Netsil_AOC.egg-info/dependency_links.txt
-Netsil_AOC.egg-info/entry_points.txt
-Netsil_AOC.egg-info/requires.txt
-Netsil_AOC.egg-info/top_level.txt
