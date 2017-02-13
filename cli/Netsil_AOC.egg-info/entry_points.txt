@@ -1,0 +1,4 @@
+
+        [console_scripts]
+        netsil_aoc=netsilaoc:cli
+    
