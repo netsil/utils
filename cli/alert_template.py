@@ -33,7 +33,6 @@ def GetAlertTemplateDetails(keys, id):
         response = c.get(templateURL)
         parsed = json.loads(response.text)
  
-        #parsed = parsed[0]  #delete this once the bug is fixed
         if len(keys) == 0:
             print json.dumps(parsed, indent=4, sort_keys=True)
             return
