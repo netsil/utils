@@ -3,6 +3,7 @@ import json
 import requests
 from requests import session
 from aocurls import *
+from cliutils import PrettyPrint
 
 #== Command Execution Functions ==
 
@@ -15,18 +16,11 @@ def GetServiceList(verbose):
         if verbose > 1:
             print json.dumps(parsed, indent=4, sort_keys=True)
             return;
- 
-        # base verbosity: print id, name, description
-        print ("Service Id \t,\t Service Name \t,\t Service Description") 
-        print ("-------------------------------------------------------------------------------------------------------")
-        for service in parsed:
-            print (str(service["serviceId"]) + "\t,\t" + str(service["name"]) + " \t,\t" + str(service["description"]))
-            
-        print ("-------------------------------------------------------------------------------------------------------")
-        print len(parsed)
+        
+        PrettyPrint(parsed, ["serviceId", "name", "description"])
         return
 
-def GetServiceDetails(key, id):
+def GetServiceDetails(keys, id):
     with session() as c:
         c.post(GetAuthURL(), data=GetCredentials())
         serviceURL = GetServiceDetailsURL()
@@ -34,14 +28,13 @@ def GetServiceDetails(key, id):
         response = c.get(serviceURL)
         parsed = json.loads(response.text)
         
-        if key in parsed.keys():
-            print json.dumps(parsed[key], indent=4, sort_keys=True)
-            return
-       
-        
-        print json.dumps(parsed, indent=4, sort_keys=True)
+        for key in keys:
+            if key in parsed.keys():
+                print key + ": \t " + json.dumps(parsed[key], indent=4, sort_keys=True)
+            else:
+                print json.dumps(parsed, indent=4, sort_keys=True)
+                return
         return
-
 
 
 #== CLI Commands ==
@@ -54,7 +47,7 @@ def list(verbose):
 
 
 @click.command()
-@click.option('-k','--key', help='Value of specific service attribute. print all if key not found')
+@click.option('-k','--key', multiple=True, help='List of attributes to print. Print all if an attribute is not found')
 @click.argument('service_id')
 def details(key, service_id):
     '''Details for service'''

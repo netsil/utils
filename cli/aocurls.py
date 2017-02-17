@@ -25,7 +25,7 @@ def GetServiceDetailsURL():
 
 #== Alert Template URLs ==
 def GetAlertTemplateURL():
-    return GetAOCURL()+"/api/v0/alert"
+    return GetAOCURL()+"/api/v0/alert/template"
 
 def GetAlertTemplateDetailsURL():
     return GetAlertTemplateURL()
@@ -33,7 +33,7 @@ def GetAlertTemplateDetailsURL():
 
 #== Alert URLs ==
 def GetAlertURL():
-    return GetAOCURL()+"/api/v0/alert/instance"
+    return GetAOCURL()+"/api/v0/alert"
 
 def GetAlertDetailsURL():
     return GetAlertURL()

@@ -4,6 +4,7 @@ import requests
 from requests import session
 from aocurls import *
 from alert_template import template
+from cliutils import PrettyPrint
 
 
 
@@ -12,46 +13,44 @@ from alert_template import template
 def GetAlertList(verbose):
     with session() as c:
         c.post(GetAuthURL(), data=GetCredentials())
-        response = c.get(GetAlertTemplateURL())
+        response = c.get(GetAlertURL())
         parsed = json.loads(response.text)
-               
         if verbose > 1:
-            for template in parsed:
-                alertInstances = template["AlertInstances"]
-                for alert in alertInstances:
-                    print json.dumps(alertInstance, indent=4, sort_keys=True)
+            print json.dumps(parsed, indent=4, sort_keys=True)
             return;
  
         # base verbosity: print id, name, template id, service id
-        print ("Alert Id \t,\t Alert Name \t,\t Alert Template Id \t,\t Service Id") 
-        print ("-------------------------------------------------------------------------------------------------------")
+        #print ("Alert Id \t,\t Alert Name \t,\t Alert Template Id \t,\t Service Id") 
+        #print ("-------------------------------------------------------------------------------------------------------")
         alertCount = 0
-        for template in parsed:
-            alertInstances = template["AlertInstances"]
-            for alert in alertInstances:
-                print (str(alert["id"]) + "\t,\t" + str(alert["name"]) + " \t,\t" + str(alert["alertTemplateId"]) + "\t,\t" + str(alert["serviceId"]))
-                alertCount = alertCount + 1 
+        PrettyPrint(parsed, ["id", "name", "alertTemplateId", "serviceId"])
 
-        print ("-------------------------------------------------------------------------------------------------------")
-        print alertCount
+       # for alert in parsed:
+       #     print (str(alert["id"]) + "\t,\t" + str(alert["name"]) + " \t,\t" + str(alert["alertTemplateId"]) + "\t,\t" + str(alert["serviceId"]))
+       #     alertCount = alertCount + 1 
+
+        #print ("-------------------------------------------------------------------------------------------------------")
+        #print alertCount
+
         return
 
 
-def GetAlertDetails(key, id):
+def GetAlertDetails(keys, id):
     with session() as c:
         c.post(GetAuthURL(), data=GetCredentials())
         alertURL = GetAlertDetailsURL()
         alertURL = alertURL + "/" + id
         response = c.get(alertURL)
         parsed = json.loads(response.text)
-        
-        if key in parsed.keys():
-            print json.dumps(parsed[key], indent=4, sort_keys=True)
-            return
-            
-        print json.dumps(parsed, indent=4, sort_keys=True)
-
+ 
+        for key in keys:
+            if key in parsed.keys():
+                print key + ": \t " + json.dumps(parsed[key], indent=4, sort_keys=True)
+            else:
+                print json.dumps(parsed, indent=4, sort_keys=True)
+                return
         return
+
 
 def DeleteAlert(id):
     with session() as c:
@@ -71,7 +70,7 @@ def list(verbose):
 
 
 @click.command()
-@click.option('-k','--key', help='Value of specific alert attribute. print all if key not found')
+@click.option('-k','--key', multiple=True, help='List of attributes to print. Print all if an attribute is not found')
 @click.argument('alert_id')
 def details(key, alert_id):
     '''Details for alert '''

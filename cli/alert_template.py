@@ -3,6 +3,7 @@ import json
 import requests
 from requests import session
 from aocurls import *
+from cliutils import PrettyPrint
 
 #== Command Execution Functions ==
 
@@ -17,13 +18,10 @@ def GetAlertTemplateList(verbose):
             return;
  
         # base verbosity: print id, name, description
-        print ("Alert Template Id \t,\t Alert Template Name \t,\t Number of Alerts Using Template") 
-        print ("-------------------------------------------------------------------------------------------------------")
         for template in parsed:
-            print (str(template["id"]) + "\t,\t" + str(template["name"]) + " :\t" + str(len(template["AlertInstances"])))
-            
-        print ("-------------------------------------------------------------------------------------------------------")
-        print len(parsed)
+            template["#instances"]=len(template["AlertInstances"])
+
+        PrettyPrint(parsed, ["id","name","#instances"])
         return
 
 
@@ -35,14 +33,14 @@ def GetAlertTemplateDetails(keys, id):
         response = c.get(templateURL)
         parsed = json.loads(response.text)
  
-        parsed = parsed[0]  #delete this once the bug is fixed
+        #parsed = parsed[0]  #delete this once the bug is fixed
         if len(keys) == 0:
             print json.dumps(parsed, indent=4, sort_keys=True)
             return
 
         for key in keys:
             if key in parsed.keys():
-                print json.dumps(parsed[key], indent=4, sort_keys=True)
+                print key + ": \t " + json.dumps(parsed[key], indent=4, sort_keys=True)
             else:
                 print json.dumps(parsed, indent=4, sort_keys=True)
                 return
