@@ -27,7 +27,12 @@ def GetServiceDetails(keys, id):
         serviceURL = serviceURL + "/" + id
         response = c.get(serviceURL)
         parsed = json.loads(response.text)
-        
+ 
+        if len(keys) == 0:
+            print json.dumps(parsed, indent=4, sort_keys=True)
+            return
+
+       
         for key in keys:
             if key in parsed.keys():
                 print key + ": \t " + json.dumps(parsed[key], indent=4, sort_keys=True)
