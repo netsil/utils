@@ -6,8 +6,6 @@ from aocurls import *
 from alert_template import template
 from cliutils import PrettyPrint
 
-
-
 #== Command Execution Functions ==
 
 def GetAlertList(verbose):
@@ -18,20 +16,8 @@ def GetAlertList(verbose):
         if verbose > 1:
             print json.dumps(parsed, indent=4, sort_keys=True)
             return;
- 
-        # base verbosity: print id, name, template id, service id
-        #print ("Alert Id \t,\t Alert Name \t,\t Alert Template Id \t,\t Service Id") 
-        #print ("-------------------------------------------------------------------------------------------------------")
         alertCount = 0
         PrettyPrint(parsed, ["id", "name", "alertTemplateId", "serviceId"])
-
-       # for alert in parsed:
-       #     print (str(alert["id"]) + "\t,\t" + str(alert["name"]) + " \t,\t" + str(alert["alertTemplateId"]) + "\t,\t" + str(alert["serviceId"]))
-       #     alertCount = alertCount + 1 
-
-        #print ("-------------------------------------------------------------------------------------------------------")
-        #print alertCount
-
         return
 
 
