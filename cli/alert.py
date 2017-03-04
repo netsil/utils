@@ -4,6 +4,7 @@ import requests
 from requests import session
 from aocurls import *
 from alert_template import template
+from alert_rule import rule
 from cliutils import PrettyPrint
 
 #== Command Execution Functions ==
@@ -83,6 +84,7 @@ def alert():
     pass
 
 alert.add_command(template)
+alert.add_command(rule)
 alert.add_command(list)
 alert.add_command(details)
 alert.add_command(delete)
