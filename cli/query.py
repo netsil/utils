@@ -1,133 +1,86 @@
+import click
+import json
+import requests
+from qparser import QueryStringParser
+from analytics import CreateQuery
+import time 
+from aocurls import *
+import requests
+from requests import session
 
-def FilterReader(filter):
-    if "type" not in filter.keys():
-        return None
-
-    if filter["type"] == "match":
-        return ("( " + filter["column"] + " = " + filter["value"]["text"] + " )" )
-    if filter["type"] == "regex":
-        return ("( " + filter["column"] + " regex " + filter["value"]["text"] + " )")
-    if filter["type"] == "isin":
-        return ("( " + filter["column"] + " isin " + filter["value"]["list"]["data"]["name"] + " )")
-    
-    filterString = filter["type"] + "( " 
-    for field in filter["fields"]:
-        filterString = filterString + " " + FilterReader(field)
-    return filterString + " )"
-
-
-def GroupByReader(groupby):
-    groupbyString =" "
-    for key in groupby.keys():
-        if "SERIES" in key:
-            groupbyString = groupbyString + " " + groupby[key]
-    return groupbyString
-
-def TopReader(top):
-    return ("Top " + str(top["value"]) + " by " + top["column"])
-
-def ExpressionReader(queryStatement):
-    if "name" not in queryStatement.keys():
-        return None
-
-    dataframe = None
-   
-    if "value" in queryStatement.keys():
-        if "dataframe" in queryStatement["value"].keys():
-            dataframe = queryStatement["value"]["dataframe"]
-
-    if dataframe == None:
-        return None
-
-
-    if "expr" in dataframe.keys():
-        exprObject = {}
-        exprObject["name"]  = queryStatement["name"]
-        exprObject["expression"] = dataframe["expr"]
-        return exprObject
-
-    if "_type" in dataframe.keys():
-        if dataframe["_type"] == "rolling":
-            exprObject = {}
-            exprObject["name"]  = queryStatement["name"]
-            exprObject["expression"] = dataframe["_type"] + " " + dataframe["aggregation"] + " " + dataframe["window"] + " " + dataframe["dataframe"]["name"]
-            return exprObject
-        if dataframe["_type"] == "topn":
-            exprObject = {}
-            exprObject["name"]  = queryStatement["name"]
-            ascending = "descending"
-            if "ascending" in dataframe.keys():
-                ascending = "ascending"
-            exprObject["expression"] = dataframe["_type"] + " " + str(dataframe["n"]) + " " + dataframe["aggregation"] + " " + dataframe["dataframe"]["name"] + " (" + ascending + ")"
-            return exprObject
-    
-    return None
-
-
-
-def QueryReader(query):
-    filter = "FILTER"
-    top = "LIMIT"
-    datasource = "report-name"
-    groupby = "GroupBy"
-    timeshift = "timeshift"
-    function = "Metrics"
-    aggregate = "aggregate"
-    serviceFilter = "ServiceID"
-    
-    outDataSource = "datasource"
-    outFunction = "aggregate"
-    outGroupBy = "groupby"
-    outFilter = "filter"
-    outServiceFilter = "service"
-    outTop = "top"
-    outName = "name"
-    outStatementRef = "statement"
-    outTimeShift = "timeshift"
-    outExpression = "expression"
-    queryName = query["name"]
-    queryObjects = []
-    exprObjects = []
-    for queryStatement in query["value"]["statements"]:
-        if "name" not in queryStatement.keys():
-            continue
-        if "query" not in queryStatement["value"].keys():
-            exprObject = ExpressionReader(queryStatement)
-            if exprObject != None:
-                exprObjects.append(exprObject)
-            continue
+def PostQuery(query):
+    with session() as c:
+        c.post(GetAuthURL(), data=GetCredentials())
+        #print json.dumps(query)
+        resp = c.post(GetQueryPostURL(),json=query)
+        print json.dumps(resp.json(), indent=4, sort_keys=True)
         
-        statementRef = queryStatement["name"]
-        innerQuery = queryStatement["value"]["query"]
-        queryOptions = innerQuery["options"]
-
-        queryObject = {}
-        queryObject[outName] = queryName
-        queryObject[outStatementRef] = statementRef
-        queryObject[outDataSource] = innerQuery[datasource]
-        queryObject[outFunction] = queryOptions[function][statementRef][aggregate] 
-        queryObject[outFilter] = FilterReader(queryOptions[filter])
-        queryObject[outGroupBy] = GroupByReader(queryOptions[groupby])
-        queryObject[outTimeShift] = queryOptions[timeshift]
-
-        if top in queryOptions.keys():
-            queryObject[outTop] = TopReader(queryOptions[top])
-        else:
-            queryObject[outTop] = None
-
-        if serviceFilter in queryOptions.keys():
-            queryObject[outServiceFilter] = queryOptions[serviceFilter]["server"]
-        else:
-            queryObject[outServiceFilter] = None
-        queryObjects.append(queryObject)
-
-    returnObjects = {}
-    returnObjects["queries"] = queryObjects
-    returnObjects["expressions"] = exprObjects
-    return returnObjects
-
+        return
         
 
 
+def CreateQueryFromFile(qfile, interval, granularity):
+    print "I will create query from file: " + qfile
+    return {}
 
+def CreateQueryFromString(qstr, interval, granularity):
+    qs = QueryStringParser(qstr)
+    #print qs
+    tmpQueries = CreateQuery(qs)
+    queries = {}
+    queries["statements"] = tmpQueries["queries"]
+    queries["type_propname"] = "_type"
+    queries["granularity_hint"]= granularity
+    l = []
+    l.append(interval)
+    queries["statements"][0]["value"]["statements"][0]["value"]["query"]["options"]["INTERVALS"]=l
+    PostQuery(queries)
+    return
+
+def ConvertToMS(unit):
+    if unit == "s":
+        return 1000
+    if unit == "m":
+        return 60 * 1000
+    if unit == "h":
+        return 60 * 60 * 1000
+    if unit == "d":
+        return 24 * 60 * 60 * 1000
+
+def PrepareTimeInterval(start, end, unit):
+    now = time.time()
+    interval = []
+    msConv = ConvertToMS(unit)
+    interval.append( now * 1000 - start * msConv )
+    interval.append( now * 1000 - end * msConv )
+    return interval
+
+def PrepareGranularity(granularity, unit):
+    return granularity * ConvertToMS(unit)
+
+#== CLI Commands ==
+@click.command()
+@click.option('-f','--file', is_flag=True)
+@click.option('-s','--start', default=300, help="start time for query specified as (now - s). default is 600" )
+@click.option('-e','--end', default=0, help="end time for query specified as (now - e). default is 0")
+@click.option('-u','--unit', type=click.Choice(['s','m','h','d']), default='s', help="time unit for the interval and granularity. can be s|m|h|d. default is s")
+@click.option('-g','--granularity', default=60, help="granularity of data. default is 60")
+@click.argument('query')
+def run(file, start, end, unit, granularity, query):
+    ''' Run Query '''
+
+    intervalInMS = PrepareTimeInterval(start, end, unit)
+    granularityInMS = PrepareGranularity(granularity, unit)
+    if file:
+        CreateQueryFromFile(query, intervalInMS, granularityInMS)
+    else:
+        CreateQueryFromString(query, intervalInMS, granularityInMS)
+
+#== CLI Command Group ==
+@click.group()
+def query():
+    ''' Netsil AOC Query Commands '''
+    pass
+
+query.add_command(run)
 

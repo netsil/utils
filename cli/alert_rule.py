@@ -4,7 +4,7 @@ import requests
 from requests import session
 from aocurls import *
 from cliutils import PrettyPrint, JSONLoadsString
-from query import QueryReader
+from qreader import QueryReader
 
 #== Command Execution Functions ==
 
