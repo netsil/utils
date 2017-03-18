@@ -28,12 +28,12 @@ def CreateQueryFromString(qstr, interval, granularity):
     #print qs
     tmpQueries = CreateQuery(qs)
     queries = {}
-    queries["statements"] = tmpQueries["queries"]
+    queries["queries"] = tmpQueries["queries"]
     queries["type_propname"] = "_type"
     queries["granularity_hint"]= granularity
     l = []
     l.append(interval)
-    queries["statements"][0]["value"]["statements"][0]["value"]["query"]["options"]["INTERVALS"]=l
+    queries["queries"][0]["value"]["statements"][0]["value"]["query"]["options"]["INTERVALS"]=l
     PostQuery(queries)
     return
 
