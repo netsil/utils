@@ -1,3 +1,5 @@
-sudo pip install requests
-sudo pip install slackclient
-sudo pip install --editable .
+pip install requests
+pip install slackclient
+pip install --editable .
+pip install pypeg2
+pip install pytz
