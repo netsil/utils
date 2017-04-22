@@ -1,3 +1,5 @@
-sudo pip install Click
-sudo pip install requests
-sudo pip install --editable .
+pip install Click
+pip install requests
+pip install --editable .
+pip install pypeg2
+pip install pytz
