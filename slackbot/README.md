@@ -42,7 +42,7 @@ Slackbot Query Format:
 
 - Filters, GroupBys, timeshift, granularity and timeInterval are optional
 - Filters can be match type (=) or regex type (~)
-- Multiple filters and group-by's supported. Separate them by commas. 
+- Multiple filters and group-bys supported. Separate them by commas. 
 
 
 Query Examples:
