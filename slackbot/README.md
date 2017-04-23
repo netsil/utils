@@ -1,14 +1,25 @@
 # Netsil SlackBot
 
 ``` bash
+git clone https://github.com/netsil/utils.git   #clone netsil utils repo
+cd /your_clone_of_netsil_utils/slackbot         #change to the slackbot directory
+sudo pip install virtualenv                     #install virtualenv
+virtualenv venv                                 #launch a virtual env in the cli/ folder
+. venv/bin/activate                             #Activate virtual env
+source package.sh                               #Install dependencies 
+
+```
+
+``` bash
 export AOC_USER=<aoc_username>              #(set your aoc username)
 export AOC_PWD=<aoc_password>              #(set your aoc password) 
 export AOC_URL=https://your.netsil.url     #(leave out the end '/')
-export AOC_SLACKBOT_NAME='netsilbot'		  #(set your slackbot name) 					
+export AOC_SLACKBOT_NAME='netsilbot'		  #(set your slackbot name)
 export AOC_SLACKBOT_TOKEN=<slackbot_token>	  #(set your slackbot token)
 											  #For Netsil: Get token from https://netsil-inc.slack.com/apps/
 
 ```
+
 ``` bash
 python netsilbot.py
 ```
