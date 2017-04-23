@@ -1,6 +1,6 @@
 import re
 import json
-from cliutils import JSONLoadsString
+from botutils import JSONLoadsString
 import datetime
 import pytz
 
