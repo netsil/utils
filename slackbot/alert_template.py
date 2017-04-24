@@ -1,9 +1,9 @@
-import click
+#import click
 import json
 import requests
 from requests import session
 from aocurls import *
-from cliutils import PrettyPrint
+#from cliutils import PrettyPrint
 from botutils import *  
 
 #== Command Execution Functions ==

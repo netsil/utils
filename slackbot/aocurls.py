@@ -48,3 +48,6 @@ def GetAlertRuleURL():
 
 def GetAlertRuleDetailsURL():
     return GetAlertRuleURL()
+
+def GetQueryPostURL():
+    return GetAOCURL()+"/query/analytics"

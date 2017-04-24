@@ -1,6 +1,6 @@
 from service import *
 from alert import *
-
+from query import *
 import os
 import time
 from slackclient import SlackClient
@@ -16,7 +16,7 @@ BOT_NAME = GetBotName()
 SLACK_BOT_TOKEN = GetBotToken()
 slack_client = SlackClient(SLACK_BOT_TOKEN)
 READ_WEBSOCKET_DELAY = 1 # 1 second delay between reading from firehose
-COMMANDS=['alert', 'service'] #Slackbot commands
+COMMANDS=['alert', 'service', 'query'] #Slackbot commands
 
 def GetBotID():
     api_call = slack_client.api_call("users.list")
@@ -140,6 +140,25 @@ def handle_command(command, channel):
         else:
             sendSlackMessage(response, channel)
 
+    elif command.startswith(COMMANDS[2]):
+        subcommand = command.split(' ')[1]
+        if(subcommand=='run'):
+            if(len(command.split(' '))>2):
+                queryText = command.split('run')[1].strip()
+            else:
+                queryText=''
+
+            print queryText
+
+            response=''
+            response = RunQuery(query=queryText)
+            #print response
+
+            sendSlackMessageWithAttactment(response, channel)
+        
+        else:
+            sendSlackMessage(response, channel)
+
     else:
         sendSlackMessage(response, channel)
 
@@ -155,7 +174,7 @@ def parse_slack_output(slack_rtm_output):
         for output in output_list:
             if output and 'text' in output and AT_BOT in output['text']:
                 # return text after the @ mention, whitespace removed
-                return output['text'].split(AT_BOT)[1].strip().lower(), \
+                return output['text'].split(AT_BOT)[1].strip(), \
                        output['channel']
     return None, None
 
@@ -171,6 +190,7 @@ def runbot():
                 except:
                     slack_client.api_call("chat.postMessage", channel=channel,
                           text="Error in processing request", as_user=True)
+                    #print 'Error'
                     pass
             time.sleep(READ_WEBSOCKET_DELAY)
     else:
