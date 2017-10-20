@@ -14,13 +14,10 @@ def PostQuery(query):
         #print json.dumps(query)
         resp = c.post(GetQueryPostURL(),json=query)
         print json.dumps(resp.json(), indent=4, sort_keys=True)
-        
-        return
-        
-
+        return 
 
 def CreateQueryFromFile(qfile, interval, granularity):
-    print "I will create query from file: " + qfile
+    print "NOT YET IMPLEMENTED TO BUILD QUERY FROM FILE " + qfile
     return {}
 
 def CreateQueryFromString(qstr, interval, granularity):
@@ -34,6 +31,7 @@ def CreateQueryFromString(qstr, interval, granularity):
     l = []
     l.append(interval)
     queries["queries"][0]["value"]["statements"][0]["value"]["query"]["options"]["INTERVALS"]=l
+    #print(queries)
     PostQuery(queries)
     return
 
@@ -60,18 +58,18 @@ def PrepareGranularity(granularity, unit):
 
 #== CLI Commands ==
 @click.command()
-@click.option('-f','--file', is_flag=True)
-@click.option('-s','--start', default=300, help="start time for query specified as (now - s). default is 600" )
+@click.option('-f','--filename', is_flag=True)
+@click.option('-s','--start', default=300, help="start time for query specified as (now - s). default is 300" )
 @click.option('-e','--end', default=0, help="end time for query specified as (now - e). default is 0")
 @click.option('-u','--unit', type=click.Choice(['s','m','h','d']), default='s', help="time unit for the interval and granularity. can be s|m|h|d. default is s")
 @click.option('-g','--granularity', default=60, help="granularity of data. default is 60")
 @click.argument('query')
-def run(file, start, end, unit, granularity, query):
+def run(filename, start, end, unit, granularity, query):
     ''' Run Query '''
 
     intervalInMS = PrepareTimeInterval(start, end, unit)
     granularityInMS = PrepareGranularity(granularity, unit)
-    if file:
+    if filename:
         CreateQueryFromFile(query, intervalInMS, granularityInMS)
     else:
         CreateQueryFromString(query, intervalInMS, granularityInMS)
