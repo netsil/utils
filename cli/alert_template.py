@@ -45,6 +45,14 @@ def GetAlertTemplateDetails(keys, id):
                 return
         return
 
+def DeleteAlertTemplate(id):
+    with session() as c:
+        c.post(GetAuthURL(), data=GetCredentials())
+        alertTemplateURL = GetAlertTemplateDetailsURL()
+        alertTemplateURL = alertTemplateURL + "/" + id
+        response = c.delete(alertTemplateURL)
+        return
+
 
 #== CLI Commands ==
 
@@ -62,6 +70,13 @@ def details(key, template_id):
     '''Details for alert template'''
     GetAlertTemplateDetails(key, template_id)
 
+@click.command()
+@click.argument('alert_template_id')
+def delete(alert_template_id):
+    ''' Delete Alert '''
+    if click.confirm("Do you want to delete the alert template?"):
+        DeleteAlertTemplate(alert_template_id)
+
 
 #== CLI Command Group ==
 
@@ -72,4 +87,5 @@ def template():
 
 template.add_command(list)
 template.add_command(details)
+template.add_command(delete)
 	

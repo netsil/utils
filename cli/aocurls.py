@@ -30,6 +30,9 @@ def GetAlertTemplateURL():
 def GetAlertTemplateDetailsURL():
     return GetAlertTemplateURL()
 
+def GetAlertTemplateCreateURL():
+    return GetAlertTemplateURL()
+
 
 #== Alert URLs ==
 def GetAlertURL():
@@ -38,11 +41,30 @@ def GetAlertURL():
 def GetAlertDetailsURL():
     return GetAlertURL()
 
+def GetAlertCreateURL():
+    return GetAlertURL()
+            
 def GetAlertRuleURL():
     return GetAOCURL()+"/api/v0/alert/rule"
 
 def GetAlertRuleDetailsURL():
     return GetAlertRuleURL()
 
+def GetAlertRuleCreateURL():
+    return GetAlertRuleURL()
+
+def GetAlertTriggerURL():
+    return GetAOCURL()+"/api/v0/alert/trigger"
+
+def GetAlertTriggerCreateURL():
+    return GetAlertTriggerURL()
+
+def GetAlertNotificationURL(ptype):
+    return GetAOCURL() + "/api/v0/alert/notification/" + ptype
+
+def GetAlertPolicyURL(ptype):
+    return GetAOCURL() + "/api/v0/alert/policy/" + ptype
+
+#== Query URLs ==
 def GetQueryPostURL():
     return GetAOCURL()+"/query/analytics"

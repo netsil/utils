@@ -91,6 +91,7 @@ def TSValueInMS(tsStr):
 class Timeshift(List):
     grammar = attr("keyword", TimeshiftKeyword), attr("value", TimeshiftValue)
 
+# Query Syntax  "A = avg(http.request_response.latency { http.uri ~ "/catalogue" }) by (client.pod_name) top(20) offset 1h"
 class QS(List):
     grammar = attr("name", QSName), "=", attr("aggregate", Aggregate), "(", attr("datasource", Datasource), attr("filters", optional(Filters)), ")", \
 			attr("groupby", optional(GroupBy)), attr("timeshift", optional(Timeshift))
@@ -185,9 +186,7 @@ class SQKeyword(Keyword):
 
 class SQSection(List):
     grammar = attr("keyword", SQKeyword), ":" , attr("name", SQName) ,",", attr("return_stmt", QSName)
-
-
-       
+ 
 
 def QueryStringParser(qstr):
     qs = parse(qstr, QS)
