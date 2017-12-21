@@ -3,6 +3,8 @@ import json
 from cliutils import JSONLoadsString
 import datetime
 import pytz
+from qparser import QueryStringParser
+
 
 SAFE_COUNT = 20
 
@@ -23,6 +25,16 @@ def SetGranularity(granularity):
 def GetGranularity():
     return __GRANULARITY_
 
+def getQueryName(i):
+    # first query name is A, second is B, ... 27th query is AA and so on
+    nameString = "ABCDEFGHIJKLMNOPQRSTUVWXYZ"
+    if i <= 26 :
+        return nameString[i-1]
+    q = (i-1) / 26
+    r = i - 26*q
+    return getQueryName(q)+getQueryName(r)
+
+
 def CreateDataReference(queryNames):
     refObject = {}
     for queryName in queryNames:
@@ -34,7 +46,7 @@ def CreateDataReference(queryNames):
                     },
                 "ungrouped_cols": "INTERVAL",
                 "aggregation": "count",
-                "sort_by": "A",
+                "sort_by": queryName,
                 "n": SAFE_COUNT,
                 "_type": "topn"
                 },
@@ -85,7 +97,7 @@ def CreateGroupBy(attributes):
     groupByObject = {}
     groupByObject["XAXIS"]= "INTERVAL"
     if len(attributes) <= 0:
-        groupByObject["SERIES_O"] = "none"
+        groupByObject["SERIES_0"] = "none"
         return groupByObject
 
     for i, attribute in enumerate(attributes):
@@ -184,7 +196,8 @@ def CreateQueryOptions(qs):
 
     function = {
             "column":"",
-            "aggregate": qs[AGGREGATE]
+            "aggregate": qs[AGGREGATE],
+            "timeRollup" : qs["timerollup"]
             }
     metrics = {}
     metrics[qs[NAME]] = function
@@ -276,6 +289,50 @@ def CreateQuery(qs):
     
     queries["queries"].append(query)
     return queries
+
+def CreateQueryFromString(qstr):
+    #parse into a dictionary
+    qs = QueryStringParser(qstr)
+    return CreateQuery(qs)
+
+
+def CreateQueriesFromStringList(qlist, giveName):
+    # DOESN'T HANDLE SUB-QUERIES!!!
+
+    qcount = len(qlist)
+    queryList = []
+    queryNames = []
+    statements = []
+    for i in range(0, qcount):
+        qstr = qlist[i]
+        if giveName == True:
+            name = getQueryName(i+1)
+            qstr = name + " = " + qstr
+        qs = QueryStringParser(qstr)
+        queryNames.append(qs["name"])
+        statements.append(CreateQueryStatement(qs))
+    
+    statements.append(CreateDataReference(queryNames))
+
+    queries={}
+    queries["queries"]= []
+    
+    query = {}
+    query["name"]="main query"
+    query["_type"]="assignment"
+
+    valueObject = {}
+    valueObject["statements"]=statements
+    valueObject["_type"]="local_scope"
+     
+    query["value"] = valueObject 
+    
+    queries["queries"].append(query)
+    queries["queryNames"]=queryNames 
+    #print(queries)
+    return queries
+
+
 
 def CreateEvalDataFrame(labels):
     if len(labels) == 0:

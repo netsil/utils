@@ -1,7 +1,7 @@
 import click
-from service import service
 from alert import alert
 from query import query
+from dashboard import dashboard
 
 @click.group()
 def cli():
@@ -9,8 +9,8 @@ def cli():
     pass
 
 
-cli.add_command(service)
 cli.add_command(alert)
 cli.add_command(query)
+cli.add_command(dashboard)
 
 

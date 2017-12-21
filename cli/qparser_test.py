@@ -33,7 +33,7 @@ print (b.__dict__)
 print (hasattr(b,"filters"))
 
 
-f = parse(" AAAA = sum ( http.request_response.latency {a=b, e=http://luba_duba.com/?, http.uri + SQ1} ) by (http.uri)  timeshift 30s ", QS)
+f = parse(" AAAA = sum ( http.request_response.latency {a=b, e=http://luba_duba.com/?, http.uri + SQ1} ) by (http.uri)  timeshift(30s) ", QS)
 
 print(f.name)
 print(f.aggregate)
@@ -88,3 +88,7 @@ print(e3.aggregate)
 print(e3.reference)
 print(e3.value)
 print(e3.ascdsc)
+
+
+f = QueryStringParser(" AAAA = sum ( http.request_response.latency {a=b, e=http://luba_duba.com/?, http.uri + SQ1} [avg] ) by (http.uri)  timeshift(30s) ")
+print(f)
