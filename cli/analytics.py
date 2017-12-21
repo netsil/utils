@@ -3,7 +3,7 @@ import json
 from cliutils import JSONLoadsString
 import datetime
 import pytz
-from qparser import QueryStringParser
+from qparser import QueryStringParser, EvalStringParser
 
 
 SAFE_COUNT = 20
@@ -14,6 +14,10 @@ DATASOURCE = "datasource"
 AGGREGATE = "aggregate"
 GROUPBY = "group by"
 FILTERS = "filters"
+
+#query type
+METRIC = "METRIC"
+EVAL = "EVAL"
 
 #Granularity controls amount and also impacts asof_tolerance during alignment of time series; defaulted to 1min
 __GRANULARITY_ = 60000
@@ -34,6 +38,12 @@ def getQueryName(i):
     r = i - 26*q
     return getQueryName(q)+getQueryName(r)
 
+def getQueryType(qstr):
+    evalPattern = re.compile(r"=[ ]*eval[ ]*\[")
+    evalList = re.findall(evalPattern, qstr)
+    if len(evalList) !=0:
+        return EVAL
+    return METRIC
 
 def CreateDataReference(queryNames):
     refObject = {}
@@ -296,44 +306,6 @@ def CreateQueryFromString(qstr):
     return CreateQuery(qs)
 
 
-def CreateQueriesFromStringList(qlist, giveName):
-    # DOESN'T HANDLE SUB-QUERIES!!!
-
-    qcount = len(qlist)
-    queryList = []
-    queryNames = []
-    statements = []
-    for i in range(0, qcount):
-        qstr = qlist[i]
-        if giveName == True:
-            name = getQueryName(i+1)
-            qstr = name + " = " + qstr
-        qs = QueryStringParser(qstr)
-        queryNames.append(qs["name"])
-        statements.append(CreateQueryStatement(qs))
-    
-    statements.append(CreateDataReference(queryNames))
-
-    queries={}
-    queries["queries"]= []
-    
-    query = {}
-    query["name"]="main query"
-    query["_type"]="assignment"
-
-    valueObject = {}
-    valueObject["statements"]=statements
-    valueObject["_type"]="local_scope"
-     
-    query["value"] = valueObject 
-    
-    queries["queries"].append(query)
-    queries["queryNames"]=queryNames 
-    #print(queries)
-    return queries
-
-
-
 def CreateEvalDataFrame(labels):
     if len(labels) == 0:
         return None
@@ -354,8 +326,7 @@ def CreateEvalDataFrame(labels):
     return dfParent
 
 
-def CreateEvalExpr(evalExpr):
-    
+def CreateEvalExpr(evalExpr):  
     if NAME not in evalExpr.keys():
         return None
     if "expr" not in evalExpr.keys():
@@ -382,6 +353,7 @@ def CreateEvalExpr(evalExpr):
     valueObject["dataframe"]=dfObject
     evalExprStatement["value"]=valueObject
     return evalExprStatement
+
 
 def CreateRollingExpr(rollingExpr):
     if all (k in rollingExpr for k in ("name","reference", "aggregate", "window")):
@@ -430,6 +402,49 @@ def CreateTopnExpr(topnExpr):
         return returnObject 
 
     return None
+
+def CreateQueriesFromStringList(qlist, giveName):
+    # DOESN'T HANDLE SUB-QUERIES!!!
+
+    qcount = len(qlist)
+    queryList = []
+    queryNames = []
+    statements = []
+    for i in range(0, qcount):
+        qstr = qlist[i]
+        if giveName == True:
+            name = getQueryName(i+1)
+            qstr = name + " = " + qstr
+        queryType = getQueryType(qstr)
+        if queryType == METRIC:
+            qs = QueryStringParser(qstr)
+            queryNames.append(qs["name"])
+            statements.append(CreateQueryStatement(qs))
+        if queryType == EVAL:
+            es = EvalStringParser(qstr)
+            queryNames.append(es["name"])
+            statements.append(CreateEvalExpr(es))
+
+    
+    statements.append(CreateDataReference(queryNames))
+
+    queries={}
+    queries["queries"]= []
+    
+    query = {}
+    query["name"]="main query"
+    query["_type"]="assignment"
+
+    valueObject = {}
+    valueObject["statements"]=statements
+    valueObject["_type"]="local_scope"
+     
+    query["value"] = valueObject 
+    
+    queries["queries"].append(query)
+    queries["queryNames"]=queryNames 
+    #print(queries)
+    return queries
 
 
 

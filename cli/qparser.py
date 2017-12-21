@@ -145,8 +145,16 @@ class EvalExprKeyword(Keyword):
 class EvalExpr(str):
     grammar = re.compile(r"[a-zA-Z0-9\$\+\-\*\.\_\(\)\/]+")
 
-class EvalStmt(List):
+# A = eval[expression] 
+class ES(List):
     grammar = attr("name", QSName), "=", attr("keyword", EvalExprKeyword), "[", attr("expr", EvalExpr), "]"
+
+
+def EStoDict(es):
+    esDict = {}
+    esDict["name"] = es.name
+    esDict["expr"] = es.expr
+    return esDict
 
 class RollingExprKeyword(Keyword):
     grammar = Enum(Keyword("rolling"))
@@ -202,4 +210,6 @@ def QueryStringParser(qstr):
     qs = parse(qstr, QS)
     return QStoDict(qs)
 
-
+def EvalStringParser(qstr):
+    qs = parse(qstr, ES)
+    return EStoDict(qs)
