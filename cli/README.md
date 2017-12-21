@@ -19,7 +19,7 @@ virtualenv venv       #launch a virtual env in the cli/ folder
 . venv/bin/activate   #Activate virtual env
 ```
 ```bash
-source package.sh     #Install dependencies and netsil_aoc cli
+source package.sh     #Install dependencies and netsil cli
 ```
 ``` bash
 export AOC_USER=<aoc_username>                          #(set your aoc username)
