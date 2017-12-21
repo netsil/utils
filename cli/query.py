@@ -21,6 +21,7 @@ def CreateQueryFromFile(qfile, interval, granularity):
     return {}
 
 def CreateQueryFromString(qstr, interval, granularity):
+    qstr = "A="+qstr
     qs = QueryStringParser(qstr)
     #print qs
     tmpQueries = CreateQuery(qs)
