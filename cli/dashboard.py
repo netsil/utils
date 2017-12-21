@@ -21,7 +21,33 @@ def generateId():
         id += possible[idx]
 
     return id
-    
+
+def DeleteDashboard(dbid):
+    with session() as c:
+        c.post(GetAuthURL(), data=GetCredentials())
+        dbURL = GetDashboardURL()
+        dbURL = dbURL + "/" + dbid
+        response = c.delete(dbURL)
+        print response        
+        return 
+
+def GetDashboard(keys, dbid):
+    with session() as c:
+        c.post(GetAuthURL(), data=GetCredentials())
+        response = c.get(GetDashboardURL()+"/"+dbid)
+        parsed = json.loads(response.text)
+        if len(keys) == 0:
+            print json.dumps(parsed, indent=4, sort_keys=True)
+            return
+
+        for key in keys:
+            if key in parsed.keys():
+                print key + ": \t " + json.dumps(parsed[key], indent=4, sort_keys=True)
+            else:
+                print json.dumps(parsed, indent=4, sort_keys=True)
+                return
+        return
+
 
 def GetDashboardList(verbose):
     with session() as c:
@@ -30,7 +56,7 @@ def GetDashboardList(verbose):
         parsed = json.loads(response.text)
         if verbose > 1:
             print json.dumps(parsed, indent=4, sort_keys=True)
-            return;
+            return
         alertCount = 0
         PrettyPrint(parsed, ["id", "dashboardName"])
         return
@@ -64,7 +90,6 @@ def AddChart(plot, dashboard_id, name, query):
         dashboardURL = GetDashboardURL()+"/"+dashboard_id
         response = c.get(dashboardURL)
         db = json.loads(response.text)
-        print(db)
         chartId = generateId()
         rowPosition = len(db["spec"]["widgets"].keys())
         chart["vizSpecs"]["position"]["row"]=rowPosition
@@ -74,6 +99,22 @@ def AddChart(plot, dashboard_id, name, query):
         print(parsed)
         #print json.dumps(parsed, indent=4, sort_keys=True)
         return parsed
+
+
+@click.command()
+@click.argument('dashboardid')
+def delete(dashboardid):
+    ''' Delete Dashboard '''
+    if click.confirm("Do you want to delete the dashboard?"):
+        DeleteDashboard(dashboardid)
+
+@click.command()
+@click.option('-k','--key', multiple=True, help='List of attributes to print. Print all if an attribute is not found')
+@click.argument('dashboardid')
+def get(key, dashboardid):
+    ''' Get Dashboard '''
+
+    GetDashboard(key, dashboardid)
 
 
 @click.command()
@@ -107,5 +148,7 @@ def dashboard():
 
 dashboard.add_command(create)
 dashboard.add_command(list)
+dashboard.add_command(get)
+dashboard.add_command(delete)
 dashboard.add_command(addchart)
 

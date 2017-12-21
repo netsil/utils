@@ -36,7 +36,7 @@ def GetAlertTemplateCreateURL():
 
 #== Alert URLs ==
 def GetAlertURL():
-    return GetAOCURL()+"/api/v0/alert/instance"
+    return GetAOCURL()+"/api/v0/alert"
 
 def GetAlertDetailsURL():
     return GetAlertURL()
@@ -68,3 +68,7 @@ def GetAlertPolicyURL(ptype):
 #== Query URLs ==
 def GetQueryPostURL():
     return GetAOCURL()+"/query/analytics"
+
+#== Dashboard URLs ==
+def GetDashboardURL():
+    return GetAOCURL()+"/dashboards"

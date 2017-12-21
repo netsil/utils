@@ -10,6 +10,6 @@ setup(
     ],
     entry_points='''
         [console_scripts]
-        netsil_aoc=netsilaoc:cli
+        netsil=netsilaoc:cli
     ''',
 )
