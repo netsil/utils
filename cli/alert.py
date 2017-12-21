@@ -105,6 +105,47 @@ def CreateAlert(critical, warning, operator, duration, aggregation, plot, policy
         return parsed 
 
     
+def UpdateAlert(name, critical, warning, operator, duration, aggregation, plot, policy_type, policy_id, mute, alertid):
+    with session() as c:
+        c.post(GetAuthURL(), data=GetCredentials())
+        
+        alertURL = GetAlertDetailsURL()
+        alertURL = alertURL + "/" + alertid
+        response = c.get(alertURL)
+        alert = json.loads(response.text)
+        if name != None:
+            alert["name"]= name
+        if critical != None:
+            alert["conditions"]["comparison"]["criticalThreshold"]=critical
+        if warning != None:
+            alert["conditions"]["comparison"]["warningThreshold"]=warning
+        if operator != None:
+            alert["conditions"]["comparison"]["operator"]=operator
+        if duration != None:
+            alert["conditions"]["aggregation"]["duration"]=duration * 60
+        if aggregation != None:
+            alert["conditions"]["aggregation"]["function"]=aggregation
+        if plot != None:
+            alert["chartTypes"]["main query"] = plot + "-chart"
+        if mute != None:
+            if mute == True:
+                alert["silenced"]="true"
+            if mute == False:
+                alert["silenced"]="false"
+       
+        alertCreateURL = GetAlertCreateURL()
+        response = c.post(alertCreateURL, json=alert)
+        parsed = json.loads(response.text)
+                
+        if policy_id != None and policy_type != None:
+            alertNotification = CreateAlertNotification(parsed["id"], policy_type, policy_id)
+ 
+        print json.dumps(parsed, indent=4, sort_keys=True)
+
+
+
+
+
 
 
 
@@ -152,6 +193,26 @@ def create(critical, warning, operator, duration, aggregation, plot, policy_type
     CreateAlert(critical, warning, operator, duration, aggregation, plot, policy_type, policy_id, name, query)
 
 
+@click.command()
+@click.option('-n', '--name', help='Name')
+@click.option('-c', '--critical', type=float, help='Critical threshold')
+@click.option('-w', '--warning', type=float, help='Warning threshold')
+@click.option('-o', '--operator', type=click.Choice(['>','<','=']), default='>', help='Operator to check for threshold violation e.g. > critical threshold')
+@click.option('-d', '--duration', type=click.Choice(['1','5','10','30','60']), help='Time window to evaluate the alert, in mins')
+@click.option('-a', '--aggregation', type=click.Choice(['avg', 'max', 'min']), help='Aggregation function to apply for metrics in time window')
+@click.option('-p', '--plot', type=click.Choice(['line','area','stack-bar','bar', 'table', 'pie', 'gauge']), help='Chart plot type')
+@click.option('-t', '--policy_type', type=click.Choice(['webhook','email','pagerduty']), help='Notification policy type. Check out alert policy list for more details')
+@click.option('-i', '--policy_id', help='Notification policy id. Check out alert policy list for more details')
+@click.option('-m', '--mute', type=bool, help='Mute/Unmute an alert')
+@click.argument('alertid')
+def update(name, critical, warning, operator, duration, aggregation, plot, policy_type, policy_id, mute, alertid):
+    ''' Update Alert '''
+    # hack to get around a bug in click.types during display help
+    if duration != None:
+        duration = int(duration)
+    if isinstance(policy_id, unicode):
+        policy_id= policy_id.encode('utf-8')
+    UpdateAlert(name, critical, warning, operator, duration, aggregation, plot, policy_type, policy_id, mute, alertid)
 
 
 #== CLI Command Group ==
@@ -167,6 +228,7 @@ alert.add_command(list)
 alert.add_command(get)
 alert.add_command(delete)
 alert.add_command(create)
+alert.add_command(update)
 
 
 
