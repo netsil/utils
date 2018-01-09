@@ -72,3 +72,10 @@ def GetQueryPostURL():
 #== Dashboard URLs ==
 def GetDashboardURL():
     return GetAOCURL()+"/dashboards"
+
+#== Map URLs ==
+def GetMapURL():
+    return GetAOCURL()+"/topology/services"
+
+def GetTopologyMapURL():
+    return GetAOCURL()+"/auth-api/topology-map"
