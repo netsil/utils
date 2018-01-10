@@ -1,5 +1,5 @@
 ## Querying Netsil Time Series Database
-Most of the time dashboards, charts and alerts are required to understand the time series metrics. But often there are scenarios where a simple metric such as `avg disk usage` or `running container count on the host` might be useful from the cli. The `netsil query` command can be used for such simple metrics scenario. For other more complex metric handling please check out the [dashboard and charting](dashboard.md) commands.
+Most of the time dashboards, charts and alerts are required to understand the time series metrics. But often there are scenarios where a simple metric such as `avg disk usage` or `container count on the host` might be useful from the cli. The `netsil query` command can be used for such simple metrics scenario. For more complex metrics handling, please check out the [dashboard and charting](dashboard.md) commands.
 ``` bash
 netsil query run --help
 Usage: netsil query run [OPTIONS] QUERY
