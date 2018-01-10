@@ -98,7 +98,7 @@ Commands:
   details  Details for alert policy
   list     List all alert policies
   ```
-To associate a specific notification policy to an alert, you can simply do and then pass the policy id and policy type to the alert create option. For e.g.
+To associate a specific notification policy to an alert, for e.g. sending alerts to a configured webhook such as slack, you can use `policy list` to obtain the `policy id` and use this id in the alert creation or update.
 ``` bash
 >> netsil alert policy list -t "webhook"
 WebHook Alert Policies
