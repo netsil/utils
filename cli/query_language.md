@@ -1,5 +1,6 @@
 ## Netsil CLI Query Language
 The alert, dashboards and query commands rely on passing the query expression to define the metrics. CLI supports simple, prometheus style query expression. Below is an example of the query expression along with details of the syntax
+
 `throughput(http.request_response.throughput {http.status_code=500, http.uri~"/orders"}) by (server.pod_name, client.pod_name) top(10)`
 - `throughput` is the aggregation function
 - `http.request_response.throughput` is the datasource
