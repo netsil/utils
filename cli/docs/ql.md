@@ -1,9 +1,9 @@
 ## Netsil CLI Query Language
 The alert, dashboards and query commands rely on passing the query expression to define the metrics. CLI supports simple, prometheus style query expression. Below is an example of the query expression along with details of the syntax
 
-`throughput(http.request_response.throughput {http.status_code=500, http.uri~"/orders"}) by (server.pod_name, client.pod_name) top(10)`
-- `throughput` is the aggregation function
-- `http.request_response.throughput` is the datasource
+`avg(http.request_response.latency {http.status_code=500, http.uri~"/orders"}) by (server.pod_name, client.pod_name) top(10)`
+- `avg` is the aggregation function
+- `http.request_response.latency` is the datasource
 - `{ }` represents the filter clause
 - `http.status_code = 500` is a matching filter
 - `http.uri ~ "/orders"` is a regex for all `uri` container `/orders`
@@ -18,19 +18,19 @@ So the core usage provides for
 - top
 Only aggregation function and datasource are required others are optional but used frequently. The grammar syntax looks like:
 
-`aggreation_func ( datasource { filter_key = filter_value, filter_key ~ filter_value, ... } ) by (attr1, attr2,...) top(X)`
+`aggregation_func ( datasource { filter_key = filter_value, filter_key ~ filter_value, ... } ) by (attr1, attr2,...) top(X)`
 
 Advanced usage also provides two additional operations in the query
 - TimeRollup : Often the granularity of collection is different from the granularity of quering. For e.g., `cpuSystem` might be collected at 1 sec granularity but in a query might need to be reported at 1 min granularity. In such cases, TimeRollUp provides the aggregation function to apply on the time bucket. So in the example, you could say TimeRollUp as `max` reported value in the 1min bucket. Note that there could potentially be 60 datapoints in that bucket. So an aggregation function is needed to "summarize" those points for the coarse granularity. 
 The value of TimeRollup is an aggregation function such as `avg`,`max`, `min`, `sum`, etc. Most commonly `avg` is used as TimeRollup function. Below is the syntax to specify TimeRollup function.
 
-aggreation_func ( datasource { filters } `[TimeRollup_func]` ) by (attr1, attr2,...) top(X)
+aggregation_func ( datasource { filters } `[TimeRollup_func]` ) by (attr1, attr2,...) top(X)
 
 
 - TimeShift : A timeshift by X mins will plot the datapoint from t-X at t. That is, it will plot the data points from X mins ago to the current time. This is particularly useful for comparing metrics across time. For e.g. comparing HTTP latency now vs 1 hour ago during an incident response.
 TimeShift value is specified as number followd by `[s|m|h|d|w]` for seconds, mins, hrs, days, weeks. For e.g `1h` would be 1 hour time shift. The syntax for specifying TimeShift is below i.e. with keyword `offset`.
 
-aggreation_func ( datasource { filters } [TimeRollup_func] ) by (attr1, attr2,...) top(X) `offset (1h)`
+aggregation_func ( datasource { filters } [TimeRollup_func] ) by (attr1, attr2,...) top(X) `offset (1h)`
 
 ## Example Queries
 - `avg(cpuSystem) by (instance.host_name)`
