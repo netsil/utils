@@ -49,6 +49,8 @@ Example: Create an alert on available useable memory by host if it drops below 1
 ``` bash
 >> netsil alert create "MemorySpike" "avg(memPhysPctUsable) by (instance.host_name)" -c 10 -o "<" -a avg -d 5 
 ```
+Note: refer [Query Language](ql.md) for more details on the query expression.
+
 ## Delete, Get, List and Update Alert
 All these commands take the `alert id` as the input for manipulating the alert. 
 - The `list` command can be used to get the name and id of the alerts. 
