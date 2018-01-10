@@ -3,8 +3,6 @@ import json
 import requests
 from requests import session
 from aocurls import *
-from alert_template import template
-from alert_rule import rule
 from alert_policy import policy
 from cliutils import PrettyPrint
 from qparser import QueryStringParser
@@ -152,7 +150,7 @@ def UpdateAlert(name, critical, warning, operator, duration, aggregation, plot, 
 
 #== CLI Commands ==
 @click.command()
-@click.option('-v', '--verbose', default=1, help='Verbose level 1 (id, name, template id, service id); > 1 (all)')
+@click.option('-v', '--verbose', default=1, help='Verbose level 1 (id, name); > 1 (all)')
 def list(verbose):
     '''List all alerts '''
     GetAlertList(verbose)
@@ -221,8 +219,6 @@ def alert():
     ''' Netsil AOC Alert Commands '''
     pass
 
-alert.add_command(template)
-alert.add_command(rule)
 alert.add_command(policy)
 alert.add_command(list)
 alert.add_command(get)
