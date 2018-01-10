@@ -42,4 +42,3 @@ Commands:
   query      Netsil AOC Query Commands
   map        Netsil AOC Map Commands
 ```
-
