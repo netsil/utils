@@ -120,7 +120,7 @@ def get(key, dashboardid):
 @click.command()
 @click.option('-v', '--verbose', default=1, help='Verbose level 1 (id, name); > 1 (all)')
 def list(verbose):
-    '''List all alerts '''
+    '''List All Dashboards '''
     GetDashboardList(verbose)
 
 
@@ -132,7 +132,7 @@ def create(name):
     CreateDashboard(name)
 
 @click.command()
-@click.option('-p', '--plot', type=click.Choice(['line','area','stack-bar','bar', 'table', 'pie', 'gauge']), default='line', help='Chart plot type')
+@click.option('-p', '--plot', type=click.Choice(['line','area','stack-bar','bar', 'table', 'pie', 'gauge']), default='line', help='Chart plot type', show_default=True)
 @click.argument('dashboard_id')
 @click.argument('name')
 @click.argument('query', nargs=-1)

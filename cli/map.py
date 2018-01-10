@@ -317,23 +317,23 @@ def DeleteMap(mapid):
 
 #== CLI Commands ==
 @click.command()
-@click.option('-t','--maptime', default=0, help="Start time for getting the map specified as (now - t). default is 0 i.e. now. unit default is minutes" )
-@click.option('-i','--interval', type=click.Choice(['1', '5', '10', '30', '60']), default='10', help="Time interval in minutes. default is 10min. time - interval")
-@click.option('-u','--unit', type=click.Choice(['m','h','d']), default='m', help="Time unit for the time. can be min, hr, day. default is m")
+@click.option('-t','--maptime', default=0, help="Start time for getting the map specified as (now - t)", show_default=True )
+@click.option('-i','--interval', type=click.Choice(['1', '5', '10', '30', '60']), default='10', help="Time interval in minutes. time - interval", show_default=True)
+@click.option('-u','--unit', type=click.Choice(['m','h','d']), default='m', help="Time unit for the time. can be min, hr, day", show_default=True)
 @click.option('-f','--filter', multiple=True, help="Provide filters as attribute=value or attribute~value, the ~ will do regex")
 @click.option('-g','--groupby', multiple=True, help="Groupby criteria defining the nodes in the map e.g. pod_name, host_name, tags.kube_app, etc.")
 @click.argument('name')
 def create(maptime, interval, unit, filter, groupby, name):
-    ''' Create Map & Save A Local Copy In <Name.map> File '''
+    ''' Create Map & Save Locally In <Name.map> File '''
     if interval != None:
         interval = int(interval)
     timeinterval = PrepareTimeInterval(maptime, interval, unit)
     CreateMapAndSaveLocalGraph(groupby, filter, timeinterval, name)
 
 @click.command()
-@click.option('-t','--maptime', default=0, help="Start time for getting the map specified as (now - t). default is 0 i.e. now. unit default is minutes" )
-@click.option('-i','--interval', type=click.Choice(['1', '5', '10', '30', '60']), default='10', help="Time interval in minutes. default is 10min. time - interval")
-@click.option('-u','--unit', type=click.Choice(['m','h','d']), default='m', help="Time unit for the time. can be min, hr, day. default is m")
+@click.option('-t','--maptime', default=0, help="Start time for getting the map specified as (now - t)" , show_default=True)
+@click.option('-i','--interval', type=click.Choice(['1', '5', '10', '30', '60']), default='10', help="Time interval in minutes. time - interval", show_default=True)
+@click.option('-u','--unit', type=click.Choice(['m','h','d']), default='m', help="Time unit for the time. can be min, hr, day", show_default=True)
 @click.argument('id')
 def get(maptime, interval, unit, id):
     ''' Get Map & Update Local Copy '''
@@ -344,8 +344,8 @@ def get(maptime, interval, unit, id):
 
 
 @click.command()
-@click.option('-e', '--exact', default=False, type=bool, help='Only use nodes with exact match otherwise treat input as substring match')
-@click.option('-d', '--direction', type=click.Choice(['in','out', 'all']), default='all', help='Get in, out or all edges for given nodes') 
+@click.option('-e', '--exact', default=False, type=bool, help='Only use nodes with exact match otherwise treat input as substring match', show_default=True)
+@click.option('-d', '--direction', type=click.Choice(['in','out', 'all']), default='all', help='Get in, out or all edges for given nodes', show_default=True) 
 @click.argument('name')
 @click.argument('nodes', nargs=-1)
 def edges(exact, direction, name, nodes):
@@ -365,11 +365,11 @@ def paths(submap, name, source, target):
 @click.command()
 @click.option('-s', '--submap', help='Name of submap based on the nodes')
 @click.option('-d', '--depth', type=click.INT, help="Depth limit for tree")
-@click.option('-t', '--type', type=click.Choice(['bfs', 'dfs']), default='dfs', help='Tree traversal type breadth-first or depth-first')
+@click.option('-t', '--type', type=click.Choice(['bfs', 'dfs']), default='dfs', help='Tree traversal type breadth-first or depth-first', show_default=True)
 @click.argument('name')
 @click.argument('source')
 def tree(submap, depth, type, name, source):
-    ''' Get Paths From Source To Target Node '''
+    ''' Get Traversal Tree From Source '''
     GetTree(submap, depth, type, name, source)
 
 

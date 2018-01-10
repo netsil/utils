@@ -60,10 +60,10 @@ def PrepareGranularity(granularity, unit):
 #== CLI Commands ==
 @click.command()
 @click.option('-f','--filename', is_flag=True)
-@click.option('-s','--start', default=300, help="start time for query specified as (now - s). default is 300" )
-@click.option('-e','--end', default=0, help="end time for query specified as (now - e). default is 0")
-@click.option('-u','--unit', type=click.Choice(['s','m','h','d']), default='s', help="time unit for the interval and granularity. can be s|m|h|d. default is s")
-@click.option('-g','--granularity', default=60, help="granularity of data. default is 60")
+@click.option('-s','--start', default=300, help="start time for query specified as (now - s)", show_default=True )
+@click.option('-e','--end', default=0, help="end time for query specified as (now - e)", show_default=True)
+@click.option('-u','--unit', type=click.Choice(['s','m','h','d']), default='s', help="time unit for the interval and granularity", show_default=True)
+@click.option('-g','--granularity', default=60, help="granularity of data", show_default=True)
 @click.argument('query')
 def run(filename, start, end, unit, granularity, query):
     ''' Run Query '''
