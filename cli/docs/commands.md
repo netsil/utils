@@ -29,13 +29,14 @@ Options:
   -c, --critical FLOAT            Critical threshold
   -w, --warning FLOAT             Warning threshold
   -o, --operator [>|<|=]          Operator to check for threshold violation
-                                  e.g. > critical threshold. Default >
-  -d, --duration [1|5|10|30|60]   Time window to evaluate the alert, in mins. Default 1
+                                  e.g. > critical threshold  [default: >]
+  -d, --duration [1|5|10|30|60]   Time window to evaluate the alert, in mins
+                                  [default: 1]
   -a, --aggregation [avg|max|min]
                                   Aggregation function to apply for metrics in
-                                  time window. Default avg
+                                  time window  [default: avg]
   -p, --plot [line|area|stack-bar|bar|table|pie|gauge]
-                                  Chart plot type. Default line 
+                                  Chart plot type  [default: line]
   -t, --policy_type [webhook|email|pagerduty]
                                   Notification policy type. Check out alert
                                   policy list for more details
@@ -49,7 +50,9 @@ Example: Create an alert on available useable memory by host if it drops below 1
 >> netsil alert create "MemorySpike" "avg(memPhysPctUsable) by (instance.host_name)" -c 10 -o "<" -a avg -d 5 
 ```
 ## Delete, Get, List and Update Alert
-All these commands take the `alert id` as the input for manipulating the alert. The `update` command will update the attributes provided in the options including option to mute/unmute alerts for example during scheduled downtime.
+All these commands take the `alert id` as the input for manipulating the alert. 
+- The `list` command can be used to get the name and id of the alerts. 
+- The `update` command will update the attributes provided in the options including an option to mute/unmute alerts for e.g. during scheduled downtime.
 ``` bash
 >> netsil alert update --help
 Usage: netsil alert update [OPTIONS] ALERTID
