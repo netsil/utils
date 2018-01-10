@@ -13,22 +13,18 @@ git clone https://github.com/netsil/utils.git   #clone netsil utils repo
 cd /your_clone_of_netsil_utisl/cli    #change to the cli directory
  
 sudo pip install virtualenv        #install virtualenv
-```
-```bash 
-virtualenv venv       #launch a virtual env in the cli/ folder
-```
 
-```bash
+virtualenv venv       #launch a virtual env in the cli/ folder
+
 . venv/bin/activate   #Activate virtual env
-```
-```bash
+
 source package.sh     #Install dependencies and netsil cli
-```
-``` bash
+
 export AOC_USER=<aoc_username>                          #(set your aoc username)
 export AOC_PWD=<aoc_password>                          #(set your aoc password) 
 export AOC_URL=https://your.netsil.url                 #(leave out the end '/')
 ```
+
 ``` bash
 netsil --help     #All set if you see below message
 
