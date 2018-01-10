@@ -28,7 +28,7 @@ aggregation_func ( datasource { filters } `[TimeRollup_func]` ) by (attr1, attr2
 
 
 - TimeShift : A timeshift by X mins will plot the datapoint from t-X at t. That is, it will plot the data points from X mins ago to the current time. This is particularly useful for comparing metrics across time. For e.g. comparing HTTP latency now vs 1 hour ago during an incident response.
-TimeShift value is specified as number followd by `[s|m|h|d|w]` for seconds, mins, hrs, days, weeks. For e.g `1h` would be 1 hour time shift. The syntax for specifying TimeShift is below i.e. with keyword `offset`.
+TimeShift value is specified as number followed by `[s|m|h|d|w]` for seconds, mins, hrs, days, weeks. For e.g `1h` would be 1 hour time shift. The syntax for specifying TimeShift is below i.e. with keyword `offset`.
 
 aggregation_func ( datasource { filters } [TimeRollup_func] ) by (attr1, attr2,...) top(X) `offset (1h)`
 
