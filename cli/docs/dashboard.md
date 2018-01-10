@@ -34,7 +34,7 @@ Options:
  ``` bash
  >> netsil dashboard addchart 4920bfe7-2d86-4258-9821-3b3f040f60c2 "CPU Chart" "avg(cpuUser) by (instance.host_name)" "avg(cpuSystem) by (instance.host_name)"
 ```
-Note: refer [Query Language](query.md) for more details on the query expression.
+Note: refer [Query Language](ql.md) for more details on the query expression.
 
 ## Delete, Get and List Dashboards
 These commands use the `dashboard id` to manipulate the specific dashboard. The `id` can be obtained by using the `list` command.
