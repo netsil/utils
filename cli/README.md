@@ -42,23 +42,3 @@ Commands:
   query      Netsil AOC Query Commands
   map        Netsil AOC Map Commands
 ```
-## Commands Overview
-``` bash
-netsil alert --help
-Usage: netsil alert [OPTIONS] COMMAND [ARGS]...
-
-  Netsil AOC Alert Commands
-
-Options:
-  --help  Show this message and exit.
-
-Commands:
-  create  Create Alert
-  delete  Delete Alert
-  get     Details for alert
-  list    List all alerts
-  policy  Commands for alert policy
-  update  Update Alert
-```
-
-
