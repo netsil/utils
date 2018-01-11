@@ -44,3 +44,25 @@ Commands:
 ```
 ## CLI Commands
 Refer [docs](docs/) for more details on specific set of commands. 
+|-|-|-|
+|
+``` bash 
+netsil alert --help
+Usage: netsil alert [OPTIONS] COMMAND [ARGS]...
+
+  Netsil AOC Alert Commands
+
+Options:
+  --help  Show this message and exit.
+
+Commands:
+  create  Create Alert
+  delete  Delete Alert
+  exp     Save Alerts To File
+  get     Details for alert
+  imp     Create Alerts From File
+  list    List all alerts
+  policy  Commands for alert policy
+  update  Update Alert
+  ```|-|-|
+
