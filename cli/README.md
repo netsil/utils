@@ -44,8 +44,8 @@ Commands:
 ```
 ## CLI Commands
 Refer [docs](docs/) for more details on specific set of commands. 
-|-|-|-|
-|
+
+[Alert](alert.md)
 ``` bash 
 netsil alert --help
 Usage: netsil alert [OPTIONS] COMMAND [ARGS]...
@@ -64,5 +64,56 @@ Commands:
   list    List all alerts
   policy  Commands for alert policy
   update  Update Alert
-  ```|-|-|
+  ```
+[Dashboard](dashboard.md)
+``` bash
+netsil dashboard --help
+Usage: netsil dashboard [OPTIONS] COMMAND [ARGS]...
 
+  Netsil AOC Dashboard Commands
+
+Options:
+  --help  Show this message and exit.
+
+Commands:
+  addchart  Add Chart to Dashboard
+  create    Create Dashboard
+  delete    Delete Dashboard
+  exp       Save Dashboards To File
+  get       Get Dashboard
+  imp       Create Dashboards From File
+  list      List All Dashboards
+```
+ [Map](map.md)
+ ``` bash
+ netsil map --help
+Usage: netsil map [OPTIONS] COMMAND [ARGS]...
+
+  Netsil AOC Map Commands
+
+Options:
+  --help  Show this message and exit.
+
+Commands:
+  create    Create Map & Save Locally In <Name.map> File
+  delete    Delete the Map
+  describe  Get Map Details
+  edges     Get Edges For Nodes
+  get       Get Map & Update Local Copy
+  list      List All Maps
+  paths     Get Paths From Source To Target Node
+  tree      Get Traversal Tree From Source
+  ```
+[Query](ql.md)
+``` bash
+netsil query --help
+Usage: netsil query [OPTIONS] COMMAND [ARGS]...
+
+  Netsil AOC Query Commands
+
+Options:
+  --help  Show this message and exit.
+
+Commands:
+  run  Run Query
+```
