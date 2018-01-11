@@ -9,6 +9,7 @@ import math
 from qparser import QueryStringParser
 from analytics import CreateQuery
 from analytics import CreateQueriesFromStringList
+import sys
 
 
 #hack to generate the widget id since this is generated client side in the UI
@@ -46,20 +47,22 @@ def GetDashboard(keys, dbid):
             else:
                 print json.dumps(parsed, indent=4, sort_keys=True)
                 return
-        return
+        return parsed
 
 
-def GetDashboardList(verbose):
+def GetDashboardList(verbose=0):
     with session() as c:
         c.post(GetAuthURL(), data=GetCredentials())
         response = c.get(GetDashboardURL())
         parsed = json.loads(response.text)
+        if verbose == 0:
+            return parsed
+
         if verbose > 1:
             print json.dumps(parsed, indent=4, sort_keys=True)
-            return
-        alertCount = 0
-        PrettyPrint(parsed, ["id", "dashboardName"])
-        return
+        else:
+            PrettyPrint(parsed, ["id", "dashboardName"])
+        return parsed
     
 
 def CreateDashboard(name):
@@ -99,6 +102,53 @@ def AddChart(plot, dashboard_id, name, query):
         print(parsed)
         #print json.dumps(parsed, indent=4, sort_keys=True)
         return parsed
+
+def WriteDB(dbs, fname):
+    try:
+        with open(fname,"w") as fh:
+                fh.write(json.dumps(dbs))
+                fh.write("\n")
+                fh.close()
+    except IOError as e:
+        print "Unable to open file: " + fname #Does not exist OR no read permissions
+        sys.exit(1)
+
+def ReadDB(fname):
+    try:
+        with open(fname,"r") as fh:
+                dbs = json.loads(fh.readline())
+                fh.close()
+                return dbs
+    except IOError as e:
+        print "Unable to open file: " + fname #Does not exist OR no read permissions
+        sys.exit(1)
+
+
+def ExportDashboard(fname, ids):
+    dbs = GetDashboardList()
+    if len(ids) == 0:
+        print "Exporting All Dashboards to " + fname
+        WriteDB(dbs, fname)
+        return
+    
+    toExport = []
+    for db in dbs:
+        dbid = db["id"]
+        if dbid in ids:
+            print "Exporting Dashboard Id = " + dbid + ", Name = " + db["dashboardName"]
+            toExport.append(db)
+    WriteDB(toExport, fname)
+    return
+
+def ImportDashboard(fname):
+    dbs = ReadDB(fname)
+    with session() as c:
+        c.post(GetAuthURL(), data=GetCredentials())
+        dashboardURL = GetDashboardURL()
+        for db in dbs:
+            db.pop("id",None)
+            print "Importing " + db["dashboardName"]
+            response = c.post(dashboardURL, json=db)
 
 
 @click.command()
@@ -141,6 +191,20 @@ def addchart(plot, dashboard_id, name, query):
     AddChart(plot, dashboard_id, name, query)
     #CreateQueriesFromStringList(query, True)
 
+@click.command()
+@click.argument('filename')
+@click.argument('ids', nargs=-1)
+def exp(filename, ids):
+    ''' Save Dashboards To File '''
+    ExportDashboard(filename, ids)
+
+@click.command()
+@click.argument('filename')
+def imp(filename):
+    ''' Create Dashboards From File '''
+    ImportDashboard(filename)
+
+
 @click.group()
 def dashboard():
     ''' Netsil AOC Dashboard Commands '''
@@ -151,4 +215,7 @@ dashboard.add_command(list)
 dashboard.add_command(get)
 dashboard.add_command(delete)
 dashboard.add_command(addchart)
+dashboard.add_command(exp)
+dashboard.add_command(imp)
+
 
