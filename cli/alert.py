@@ -8,20 +8,24 @@ from cliutils import PrettyPrint
 from qparser import QueryStringParser
 from analytics import CreateQuery
 from analytics import CreateQueriesFromStringList
+import sys
 
 #== Command Execution Functions ==
 
-def GetAlertList(verbose):
+def GetAlertList(verbose = 0):
     with session() as c:
         c.post(GetAuthURL(), data=GetCredentials())
         response = c.get(GetAlertURL())
         parsed = json.loads(response.text)
+        
+        if verbose == 0:
+            return parsed
+
         if verbose > 1:
             print json.dumps(parsed, indent=4, sort_keys=True)
-            return;
-        alertCount = 0
-        PrettyPrint(parsed, ["id", "name"])
-        return
+        else:
+            PrettyPrint(parsed, ["id", "name"])
+        return parsed
 
 
 def GetAlertDetails(keys, id):
@@ -141,11 +145,52 @@ def UpdateAlert(name, critical, warning, operator, duration, aggregation, plot, 
         print json.dumps(parsed, indent=4, sort_keys=True)
 
 
+def WriteAlert(alerts, fname):
+    try:
+        with open(fname,"w") as fh:
+                fh.write(json.dumps(alerts))
+                fh.write("\n")
+                fh.close()
+    except IOError as e:
+        print "Unable to open file: " + fname #Does not exist OR no read permissions
+        sys.exit(1)
+
+def ReadAlert(fname):
+    try:
+        with open(fname,"r") as fh:
+                alerts = json.loads(fh.readline())
+                fh.close()
+                return alerts
+    except IOError as e:
+        print "Unable to open file: " + fname #Does not exist OR no read permissions
+        sys.exit(1)
 
 
+def ExportAlert(fname, ids):
+    alerts = GetAlertList()
+    if len(ids) == 0:
+        print "Exporting All Alerts to " + fname
+        WriteAlert(alerts, fname)
+        return
+    
+    toExport = []
+    for alert in alerts:
+        alertid = alert["id"]
+        if alertid in ids:
+            print "Exporting Alert Id = " + alertid + ", Name = " + alert["name"]
+            toExport.append(alert)
+    WriteAlert(toExport, fname)
+    return
 
-
-
+def ImportAlert(fname):
+    alerts = ReadAlert(fname)
+    with session() as c:
+        c.post(GetAuthURL(), data=GetCredentials())
+        alertURL = GetAlertURL()
+        for alert in alerts:
+            alert.pop("id",None)
+            print "Importing " + alert["name"]
+            response = c.post(alertURL, json=alert)
 
 
 #== CLI Commands ==
@@ -212,6 +257,18 @@ def update(name, critical, warning, operator, duration, aggregation, plot, polic
         policy_id= policy_id.encode('utf-8')
     UpdateAlert(name, critical, warning, operator, duration, aggregation, plot, policy_type, policy_id, mute, alertid)
 
+@click.command()
+@click.argument('filename')
+@click.argument('ids', nargs=-1)
+def exp(filename, ids):
+    ''' Save Alerts To File '''
+    ExportAlert(filename, ids)
+
+@click.command()
+@click.argument('filename')
+def imp(filename):
+    ''' Create Alerts From File '''
+    ImportAlert(filename)
 
 #== CLI Command Group ==
 @click.group()
@@ -225,6 +282,8 @@ alert.add_command(get)
 alert.add_command(delete)
 alert.add_command(create)
 alert.add_command(update)
+alert.add_command(exp)
+alert.add_command(imp)
 
 
 
