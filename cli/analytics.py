@@ -410,6 +410,7 @@ def CreateQueriesFromStringList(qlist, giveName):
     queryList = []
     queryNames = []
     statements = []
+    labels = {}
     for i in range(0, qcount):
         qstr = qlist[i]
         if giveName == True:
@@ -420,10 +421,12 @@ def CreateQueriesFromStringList(qlist, giveName):
             qs = QueryStringParser(qstr)
             queryNames.append(qs["name"])
             statements.append(CreateQueryStatement(qs))
+            labels[qs["name"]]=qs["label"]
         if queryType == EVAL:
             es = EvalStringParser(qstr)
             queryNames.append(es["name"])
             statements.append(CreateEvalExpr(es))
+            labels[es["name"]]=es["label"]
 
     
     statements.append(CreateDataReference(queryNames))
@@ -443,6 +446,7 @@ def CreateQueriesFromStringList(qlist, giveName):
     
     queries["queries"].append(query)
     queries["queryNames"]=queryNames 
+    queries["labels"]=labels
     #print(queries)
     return queries
 

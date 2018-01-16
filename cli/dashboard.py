@@ -23,13 +23,15 @@ def generateId():
 
     return id
 
-def DeleteDashboard(dbid):
+def DeleteDashboard(dbidlist):
     with session() as c:
         c.post(GetAuthURL(), data=GetCredentials())
-        dbURL = GetDashboardURL()
-        dbURL = dbURL + "/" + dbid
-        response = c.delete(dbURL)
-        print response        
+        for dbid in dbidlist:
+            print "Deleting Dashboard " + dbid
+            dbURL = GetDashboardURL()
+            dbURL = dbURL + "/" + dbid
+            response = c.delete(dbURL)
+            print response        
         return 
 
 def GetDashboard(keys, dbid):
@@ -83,7 +85,7 @@ def AddChart(plot, dashboard_id, name, query):
     vizSpecs = {}
     plotType = plot + "-chart"
     vizSpecs["selectedReferences"]=tmpQueries["queryNames"]
-    vizSpecs["labels"]={}
+    vizSpecs["labels"]={"main query":tmpQueries["labels"]}
     vizSpecs["chartTypes"]={"main query":plotType}
     vizSpecs["chartTitle"]= name
     vizSpecs["position"]= { "row":0, "col":0, "size_x":1, "size_y":1 }
@@ -152,7 +154,7 @@ def ImportDashboard(fname):
 
 
 @click.command()
-@click.argument('dashboardid')
+@click.argument('dashboardid', nargs=-1)
 def delete(dashboardid):
     ''' Delete Dashboard '''
     if click.confirm("Do you want to delete the dashboard?"):

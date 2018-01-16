@@ -49,12 +49,15 @@ def GetAlertDetails(keys, id):
         return
 
 
-def DeleteAlert(id):
+def DeleteAlert(idlist):
     with session() as c:
         c.post(GetAuthURL(), data=GetCredentials())
-        alertURL = GetAlertDetailsURL()
-        alertURL = alertURL + "/" + id
-        response = c.delete(alertURL)
+        for id in idlist:
+            print "Deleting Alert " + id
+            alertURL = GetAlertDetailsURL()
+            alertURL = alertURL + "/" + id
+            response = c.delete(alertURL)
+            print response
         return  
 
 
@@ -210,7 +213,7 @@ def get(key, alert_id):
 
 
 @click.command()
-@click.argument('alert_id')
+@click.argument('alert_id', nargs=-1)
 def delete(alert_id):
     ''' Delete Alert '''
     if click.confirm("Do you want to delete the alert?"):

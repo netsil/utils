@@ -33,7 +33,7 @@ print (b.__dict__)
 print (hasattr(b,"filters"))
 
 
-f = parse(" AAAA = sum ( http.request_response.latency {a=b, e=http://luba_duba.com/?, http.uri + SQ1} ) by (http.uri)  timeshift(30s) ", QS)
+f = parse(" AAAA = sum ( http.request_response.latency {a=b, e=http://luba_duba.com/?, http.uri + SQ1} ) by (http.uri,http.status.code)  timeshift(30s) label(latency) ", QS)
 
 print(f.name)
 print(f.aggregate)
@@ -50,6 +50,9 @@ for groupbyAttr in f.groupby:
 
 print("Found timeshift")
 print(f.timeshift.value)
+
+print("Found label")
+print(f.label.value)
 
 filters = parse("{}", Filters)
 
@@ -72,17 +75,21 @@ for filter in filters:
 filters = parse("{}", Filters)
 print (len(filters)) 
 
-e1 = parse("A=eval[$B+$C+$D/$E*99.9*(2-$Y)+abs($B)]",EvalStmt)
+e1 = parse("A=eval[$B+$C+$D/$E*99.9*(2-$Y)+abs($B)] label(Sum)",ES)
+print ("Eval statement test")
 print(e1.name)
 print(e1.expr)
+print(e1.label.value)
 
 e2 = parse("ZXYZ=rolling[sum, $BBB, 30m]", RollingStmt)
+print ("Rolling statement test")
 print(e2.name)
 print(e2.aggregate)
 print(e2.reference)
 print(e2.window)
 
 e3 = parse("ABCDEYY=topn[sum, $BX, 5, asc]", TopnStmt)
+print ("TopN statement test")
 print(e3.name)
 print(e3.aggregate)
 print(e3.reference)

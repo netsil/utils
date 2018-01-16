@@ -94,10 +94,19 @@ def TSValueInMS(tsStr):
 class Timeshift(List):
     grammar = attr("keyword", TimeshiftKeyword), "(", attr("value", TimeshiftValue), ")"
 
+class LabelKeyword(Keyword):
+    grammar = Enum ( Keyword("label") )
+
+class LabelValue(str):
+    grammar = re.compile(r"[a-zA-Z0-9\.\_\-]+")
+
+class Label(List):
+    grammar = attr("keyword", LabelKeyword), "(", attr("value", LabelValue), ")"
+
 # Query Syntax  "A = avg(http.request_response.latency { http.uri ~ "/catalogue" }) by (client.pod_name) top(20) offset 1h"
 class QS(List):
     grammar = attr("name", QSName), "=", attr("aggregate", Aggregate), "(", attr("datasource", Datasource), attr("filters", optional(Filters)), attr("timerollup",optional(TimeRollup)), ")", \
-			attr("groupby", optional(GroupBy)), attr("timeshift", optional(Timeshift))
+			attr("groupby", optional(GroupBy)), attr("timeshift", optional(Timeshift)), attr("label", optional(Label))
   
 #convert the qs object to dictionary
 def QStoDict(qs):
@@ -131,6 +140,10 @@ def QStoDict(qs):
     qsDict["timeshift"]=0
     if qs.timeshift != None:
         qsDict["timeshift"] = TSValueInMS(qs.timeshift.value)
+
+    qsDict["label"]= qs.name
+    if qs.label != None:
+        qsDict["label"] = qs.label.value
     
     return qsDict
 
@@ -147,13 +160,18 @@ class EvalExpr(str):
 
 # A = eval[expression] 
 class ES(List):
-    grammar = attr("name", QSName), "=", attr("keyword", EvalExprKeyword), "[", attr("expr", EvalExpr), "]"
+    grammar = attr("name", QSName), "=", attr("keyword", EvalExprKeyword), "[", attr("expr", EvalExpr), "]" , attr("label", optional(Label))
+
 
 
 def EStoDict(es):
     esDict = {}
     esDict["name"] = es.name
     esDict["expr"] = es.expr
+    esDict["label"]= es.name
+    if es.label != None:
+        esDict["label"] = es.label.value
+
     return esDict
 
 class RollingExprKeyword(Keyword):

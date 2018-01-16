@@ -8,6 +8,7 @@ from cliutils import PrettyPrint
 from graph import *
 import math
 import random
+from graphanalytics import GraphDashboard
 
 def GetMapFileName(mapname):
     return mapname+".map"
@@ -163,7 +164,7 @@ def GetEdges(exact, direction, name, nodes):
     return edges
 
 
-def GetPaths(name, source, target, submap):
+def GetPaths(insights, name, source, target):
     g = ReadGraph(GetMapFileName(name))
     src = FindNodes(g, [source])
     if len(src) == 0:
@@ -177,9 +178,9 @@ def GetPaths(name, source, target, submap):
     paths = GetSimplePaths(g, src[0], tgt[0])
     PrintPaths(paths)
     
-    if submap != None:
+    if insights != None:
         nodes = MergeNodes(paths)
-        CreateSubMap(nodes, name, submap)
+        CreateGraphInsights(nodes, name, insights)
 
     return paths
 
@@ -208,6 +209,18 @@ def CreateLocalGraph(m, attributes):
     PrintGraph(g)
     return g
 
+def CreateGraphInsights(nodes, parentmap, name):
+    subMapAttributes = CreateSubMap(nodes, parentmap, name)
+    parentMapAttributes = ReadGraphAttr(GetMapFileName(parentmap))
+    timeinterval = parentMapAttributes["interval"]
+    sm = GetMap(subMapAttributes, timeinterval)
+    subMapAttributes["interval"] = timeinterval
+    subgraph = CreateLocalGraph(sm, subMapAttributes)
+    GraphDashboard(subgraph, subMapAttributes, name)
+    return
+
+
+
 #==== Map related get and post functions =====
 
 # create a sub map with specified nodes and attributes from an existing map
@@ -222,13 +235,14 @@ def CreateSubMap(nodes, parentmap, name):
     for attr in filterAttr:
         for key in attr.keys():
             newFilters.append(str(key + "=" + attr[key]))
-    sm = CreateMap(groupby, newFilters, name, "merge")
+    sm = CreateMap(groupby, newFilters, name, attributes["remaining"])
+    print "Created map : "
     print {"name":sm["name"], "id":sm["id"]}
     return sm
 
 
 
-def CreateMap(groupby, filter, name, remaining="auto"):
+def CreateMap(groupby, filter, name, remaining="merge"):
     mapOptions = {}
     mapOptions["name"]=name
     mapOptions["filters"]=ParseFilterList(filter)
@@ -353,24 +367,23 @@ def edges(exact, direction, name, nodes):
     GetEdges(exact, direction, name, nodes)
 
 @click.command()
-@click.option('-s', '--submap', help='Name of submap based on the nodes')
+@click.option('-m', '--submap', help='Name of submap based on the nodes')
 @click.argument('name')
 @click.argument('source')
 @click.argument('target')
 def paths(submap, name, source, target):
     ''' Get Paths From Source To Target Node '''
-    GetPaths(name, source, target, submap)
-
+    GetPaths(submap, name, source, target)
 
 @click.command()
-@click.option('-s', '--submap', help='Name of submap based on the nodes')
+@click.option('-i', '--insights', help='Provide a name to create a map and dashboard for analyzing the path edges and nodes in AOC')
 @click.option('-d', '--depth', type=click.INT, help="Depth limit for tree")
 @click.option('-t', '--type', type=click.Choice(['bfs', 'dfs']), default='dfs', help='Tree traversal type breadth-first or depth-first', show_default=True)
 @click.argument('name')
 @click.argument('source')
-def tree(submap, depth, type, name, source):
+def tree(insights, depth, type, name, source):
     ''' Get Traversal Tree From Source '''
-    GetTree(submap, depth, type, name, source)
+    GetTree(insights, depth, type, name, source)
 
 
 @click.command()

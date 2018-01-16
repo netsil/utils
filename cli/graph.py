@@ -10,7 +10,9 @@ def MakeGraph(m):
     nodes = m["nodes"].keys()
     edges = []
     for e in m["links"]:
-        edges.append(list([e["source"],e["target"]]))
+        protocols = e["metrics"].keys()
+        attr = {"protocols":protocols}
+        edges.append(list([e["source"],e["target"], attr]))
     g.add_nodes_from(nodes)
     g.add_edges_from(edges)
     return g
@@ -101,10 +103,14 @@ def GetNodes(g):
         nodes.append(MakeNode(n))
     return nodes
 
-def GetEdges(g):
+def GetEdges(g, attr=False):
     edges = []
-    for e in g.edges():
-        edges.append(MakeEdge(e))
+    for e in g.edges.data():
+        tmp = MakeEdge(e)
+        if attr:
+            if len(e) == 3:
+                tmp.append(e[2]) 
+        edges.append(tmp)
     return edges
 
 
@@ -139,8 +145,6 @@ def PrintGraph(g):
     PrintNodes(GetNodes(g))
     PrintEdges(GetEdges(g))
     return
-
-
 
 def GetNodeAttr(node, attributes):
     retObj = {}
