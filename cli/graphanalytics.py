@@ -1,5 +1,6 @@
 from dashboard import CreateDashboard, AddChart
 from graph import GetEdges, GetNodes
+import json
 
 
 K8s_DS = { 
@@ -60,7 +61,7 @@ def EdgeDashboard(graph, attributes, dbid):
     fields = attributes["groupBys"]
     groupby = CreateGroupbyForEdges(fields)
     edges = GetEdges(graph, True)
-    print edges 
+    #print edges 
     for e in edges:
         if len(e) == 3:
             attr = e[2]
@@ -76,7 +77,7 @@ def EdgeDashboard(graph, attributes, dbid):
                         qs = metric["agg"] + "( " + proto + "." + metric["ds"] + " " + filters + " ) " + groupby
                         queries.append(qs)
                     chartname = proto 
-                    print "Added chart : " + chartname
+                    print "Adding chart for protocol : " + proto + " for edge " + json.dumps(e[0]) + " -> " + json.dumps(e[1]) 
                     AddChart("table", dbid, chartname, queries)
                     
                     if proto in Status_DS.keys():
@@ -90,8 +91,6 @@ def EdgeDashboard(graph, attributes, dbid):
 def GraphDashboard(graph, attributes, name):
     db = CreateDashboard(name)
     dbid = db["id"]
-    print "Created Dashboard :"
-    print "name: " + name + ", id:" + dbid
     EdgeDashboard(graph, attributes, dbid)
 
 

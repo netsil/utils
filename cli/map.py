@@ -311,21 +311,31 @@ def GetMapAndSaveLocalGraph(id, timeinterval):
     return g
 
 
-def ListMap():
+def ListMap(name=None):
     with session() as c:
         c.post(GetAuthURL(), data=GetCredentials())
         topoURL = GetTopologyMapURL()
         response = c.get(topoURL)
         parsed = json.loads(response.text)
         PrettyPrint(parsed, ["id", "name"])
+        idlist = ""
+        if name != None:
+            print "Map Ids with names containing : " + name
+            for m in parsed:
+                if name in m["name"]:
+                    idlist = idlist + m["id"] + " "
+            print idlist
+
         return parsed
 
-def DeleteMap(mapid):
+def DeleteMap(mapidlist):
     with session() as c:
         c.post(GetAuthURL(), data=GetCredentials())
-        topoURL = GetTopologyMapURL()+"/"+mapid
-        response = c.delete(topoURL)
-        print response
+        for mapid in mapidlist:
+            print "Deleting Map " + mapid
+            topoURL = GetTopologyMapURL()+"/"+mapid
+            response = c.delete(topoURL)
+            print response
         return
 
 
@@ -387,10 +397,11 @@ def tree(insights, depth, type, name, source):
 
 
 @click.command()
-@click.argument('mapid')
+@click.argument('mapid', nargs=-1)
 def delete(mapid):
     ''' Delete the Map ''' 
-    DeleteMap(mapid)
+    if click.confirm("Do you want to delete the map?"):
+        DeleteMap(mapid)
 
 @click.command()
 @click.argument('name')
@@ -399,9 +410,10 @@ def describe(name):
     DescribeMap(name)
 
 @click.command()
-def list():
-    ''' List All Maps '''
-    ListMap()
+@click.option('-n', '--name', help='Provide substring to look for in the name of map')
+def list(name):
+    ''' List Maps '''
+    ListMap(name)
 
 @click.group()
 def map():

@@ -90,7 +90,8 @@ def GetTreeEdges(g, src, type, depth):
             edges.append(MakeEdge(e))
         return edges
     if type == "bfs":
-        for e in nx.bfs_edges(g, src, depth):
+        for e in nx.bfs_edges(g, src):
+            print e
             edges.append(MakeEdge(e))
         return edges
 
@@ -156,7 +157,6 @@ def GetNodeAttr(node, attributes):
 def MergeNodes(nlistoflist):
     nodes = []
     for nl in nlistoflist:
-        print nl
         for n in nl:
             nodes.append(n)
     return nodes
