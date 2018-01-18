@@ -134,25 +134,20 @@ def CreateMapFilter(filters):
 
 
 #==== Map Graph Related Wrapper Functions ====
-def FindNodes(g, nodes):
-    nodeList=[]
-    for n in g.nodes():
-        for sub in nodes:
-            if sub in n:
-                nodeList.append(n)
-                break
-    return nodeList
 
 def DescribeMap(name):
     g = ReadGraph(GetMapFileName(name))
     PrintGraph(g)
     return g
 
-def GetEdges(exact, direction, name, nodes):
+def GetEdges(insights, direction, name, nodes):
     g = ReadGraph(GetMapFileName(name))
-    nodeList = nodes
-    if not exact:
-        nodeList = FindNodes(g, nodes)
+    
+    nodeList = FindNodes(g, nodes)
+
+    print "Found following nodes containing: " + json.dumps(nodes)
+    PrintNodes(MakeNodes(nodeList))
+
     edges = []
     if direction == "in" or direction == "all":
         edges = edges + GetInEdges(g, nodeList)
@@ -161,6 +156,10 @@ def GetEdges(exact, direction, name, nodes):
         edges = edges + GetOutEdges(g, nodeList)
     
     PrintEdges(edges)
+    if insights != None and len(edges) > 0 :
+        nodes = MergeNodes(edges)
+        CreateGraphInsights(nodes, name, insights)
+
     return edges
 
 
@@ -175,28 +174,44 @@ def GetPaths(insights, name, source, target):
         print "Did Not Find Source Node: " + target
         return []
     
-    paths = GetSimplePaths(g, src[0], tgt[0])
+    print "Found following source nodes containing: " + source 
+    PrintNodes(MakeNodes(src))
+    print "Found following target nodes containing: " + target
+    PrintNodes(MakeNodes(tgt))
+
+    paths = []
+    for s in src:
+        for t in tgt:
+            paths = paths + GetSimplePaths(g, s, t)
+    
     PrintPaths(paths)
     
-    if insights != None:
+    if insights != None and len(paths) > 0:
         nodes = MergeNodes(paths)
         CreateGraphInsights(nodes, name, insights)
 
     return paths
 
 
-def GetTree(submap, depth, type, name, source):
+def GetTree(insights, depth, type, name, source):
    g = ReadGraph(GetMapFileName(name))
    src = FindNodes(g, [source])
    if len(src) == 0:
        print "Did Not Find Source Node: " + source
        return []
-   tree = GetTreeEdges(g, src[0], type, depth)
+   
+   print "Found following nodes containing: " + source
+   PrintNodes(MakeNodes(src))
+
+   tree = []
+   for s in src:
+       tree = tree + GetTreeEdges(g, s, type, depth)
+   
    PrintEdges(tree)
 
-   if submap != None:
+   if insights != None and len(tree) > 0:
        nodes = MergeNodes(tree)
-       CreateSubMap(nodes, name, submap)
+       CreateGraphInsights(nodes, name, insights)
 
    return tree
 
@@ -317,16 +332,21 @@ def ListMap(name=None):
         topoURL = GetTopologyMapURL()
         response = c.get(topoURL)
         parsed = json.loads(response.text)
-        PrettyPrint(parsed, ["id", "name"])
-        idlist = ""
-        if name != None:
-            print "Map Ids with names containing : " + name
-            for m in parsed:
-                if name in m["name"]:
-                    idlist = idlist + m["id"] + " "
-            print idlist
+        if name == None:
+            PrettyPrint(parsed, ["id", "name"])
+            return parsed
 
-        return parsed
+        idlist = ""
+        subset = []
+        for m in parsed:
+            if name in m["name"]:
+                idlist = idlist + m["id"] + " "
+                subset.append(m)
+        
+        PrettyPrint(subset, ["id", "name"])
+        print "Map Ids with names containing : " + name
+        print idlist
+        return subset
 
 def DeleteMap(mapidlist):
     with session() as c:
@@ -368,25 +388,25 @@ def get(maptime, interval, unit, id):
 
 
 @click.command()
-@click.option('-e', '--exact', default=False, type=bool, help='Only use nodes with exact match otherwise treat input as substring match', show_default=True)
+@click.option('-i', '--insights', help='Provide a name to create a map and dashboard for analyzing the edges in AOC')
 @click.option('-d', '--direction', type=click.Choice(['in','out', 'all']), default='all', help='Get in, out or all edges for given nodes', show_default=True) 
 @click.argument('name')
 @click.argument('nodes', nargs=-1)
-def edges(exact, direction, name, nodes):
+def edges(insights, direction, name, nodes):
     ''' Get Edges For Nodes '''
-    GetEdges(exact, direction, name, nodes)
-
-@click.command()
-@click.option('-m', '--submap', help='Name of submap based on the nodes')
-@click.argument('name')
-@click.argument('source')
-@click.argument('target')
-def paths(submap, name, source, target):
-    ''' Get Paths From Source To Target Node '''
-    GetPaths(submap, name, source, target)
+    GetEdges(insights, direction, name, nodes)
 
 @click.command()
 @click.option('-i', '--insights', help='Provide a name to create a map and dashboard for analyzing the path edges and nodes in AOC')
+@click.argument('name')
+@click.argument('source')
+@click.argument('target')
+def paths(insights, name, source, target):
+    ''' Get Paths From Source To Target Node '''
+    GetPaths(insights, name, source, target)
+
+@click.command()
+@click.option('-i', '--insights', help='Provide a name to create a map and dashboard for analyzing the tree edges and nodes in AOC')
 @click.option('-d', '--depth', type=click.INT, help="Depth limit for tree")
 @click.option('-t', '--type', type=click.Choice(['bfs', 'dfs']), default='dfs', help='Tree traversal type breadth-first or depth-first', show_default=True)
 @click.argument('name')

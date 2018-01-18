@@ -51,6 +51,15 @@ def ReadGraphAttr(fname):
         print "Unable to open file: " + fname #Does not exist OR no read permissions
         sys.exit(1)
 
+def FindNodes(g, nodes):
+    nodeList=[]
+    for n in g.nodes():
+        for sub in nodes:
+            if sub in n:
+                nodeList.append(n)
+                break
+    return nodeList
+
 # Lower level graph extraction functions
 # The node should be converted to dictionary using JSONLoadsString
 # all upper level functions assume nodes to be dictionary
@@ -58,8 +67,21 @@ def ReadGraphAttr(fname):
 def MakeNode(n):
     return JSONLoadsString(n)
 
+def MakeNodes(nodes):
+    nodeList = []
+    for n in nodes:
+        nodeList.append(MakeNode(n))
+    return nodeList
+
 def MakeEdge(e):
     return [MakeNode(e[0]), MakeNode(e[1])]
+
+def MakeEdges(edges):
+    edgeList = []
+    for e in edges:
+        edgeList.append(MakeEdge(e))
+    return edgeList
+
 
 def GetOutEdges(g, nodes):
     edges = []
@@ -95,8 +117,6 @@ def GetTreeEdges(g, src, type, depth):
             edges.append(MakeEdge(e))
         return edges
 
-
-
     
 def GetNodes(g):
     nodes = []
@@ -113,7 +133,6 @@ def GetEdges(g, attr=False):
                 tmp.append(e[2]) 
         edges.append(tmp)
     return edges
-
 
     
 #==== Upper level functions. these assume nodes are a dictionary 

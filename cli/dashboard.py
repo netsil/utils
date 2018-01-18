@@ -57,22 +57,28 @@ def GetDashboardList(verbose=0, name=None):
         c.post(GetAuthURL(), data=GetCredentials())
         response = c.get(GetDashboardURL())
         parsed = json.loads(response.text)
-        if verbose == 0:
-            return parsed
+  
+        idlist = ""
+        if name != None:
+            subset = []
+            for m in parsed:
+                if name in m["dashboardName"]:
+                    idlist = idlist + m["id"] + " "
+                    subset.append(m)
+            parsed = subset
 
+        if verbose==0:
+            return parsed
+        
         if verbose > 1:
             print json.dumps(parsed, indent=4, sort_keys=True)
         else:
             PrettyPrint(parsed, ["id", "dashboardName"])
-        
-        idlist = ""
-        if name != None:
-            print "Dashboard Ids with names containing : " + name
-            for m in parsed:
-                if name in m["dashboardName"]:
-                    idlist = idlist + m["id"] + " "
-            print idlist
 
+        if name != None:
+            print "Dashboard Ids with names containing: " + name
+            print idlist
+        
         return parsed
     
 

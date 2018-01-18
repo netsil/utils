@@ -17,6 +17,16 @@ def GetAlertList(verbose = 0, name = None):
         c.post(GetAuthURL(), data=GetCredentials())
         response = c.get(GetAlertURL())
         parsed = json.loads(response.text)
+       
+        idlist = ""
+        if name != None:
+            subset = []
+            for m in parsed:
+                if name in m["name"]:
+                    idlist = idlist + m["id"] + " "
+                    subset.append(m)
+            parsed = subset
+       
         
         if verbose == 0:
             return parsed
@@ -25,15 +35,10 @@ def GetAlertList(verbose = 0, name = None):
             print json.dumps(parsed, indent=4, sort_keys=True)
         else:
             PrettyPrint(parsed, ["id", "name"])
-        
-        idlist = ""
-        if name != None:
-            print "Alert Ids with names containing : " + name
-            for m in parsed:
-                if name in m["name"]:
-                    idlist = idlist + m["id"] + " "
-            print idlist
 
+        if name != None:
+            print "Alerts Ids with names containing: " + name
+            print idlist
         
         return parsed
 
