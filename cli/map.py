@@ -372,6 +372,7 @@ def create(maptime, interval, unit, filter, groupby, name):
     if interval != None:
         interval = int(interval)
     timeinterval = PrepareTimeInterval(maptime, interval, unit)
+    #print timeinterval
     CreateMapAndSaveLocalGraph(groupby, filter, timeinterval, name)
 
 @click.command()

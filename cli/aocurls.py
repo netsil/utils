@@ -1,6 +1,13 @@
 import os
+import sys
+
+DEFAULT_AOC_URL = "https://prod-cloud.netsil.com"
 
 def GetCredentials():
+    if "AOC_USER" not in os.environ or "AOC_PWD" not in os.environ:
+        print "Need to set AOC_USER and AOC_PWD" 
+        sys.exit(1)
+
     username = os.environ["AOC_USER"]
     password = os.environ["AOC_PWD"]
     payload = {
@@ -11,6 +18,8 @@ def GetCredentials():
 
 
 def GetAOCURL():
+    if "AOC_URL" not in os.environ:
+        return DEFAULT_AOC_URL
     return os.environ["AOC_URL"]
 
 def GetAuthURL():
