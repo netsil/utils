@@ -207,8 +207,11 @@ def create(name):
 @click.argument('query', nargs=-1)
 def addchart(plot, dashboard_id, name, query):
     ''' Add Chart to Dashboard '''
+    if query == None or len(query) == 0:
+        print "Provide at least 1 query to create the chart"
+        print "Input received dashboard id: " + dashboard_id + " name: " + name
+        return
     AddChart(plot, dashboard_id, name, query)
-    #CreateQueriesFromStringList(query, True)
 
 @click.command()
 @click.argument('filename')
