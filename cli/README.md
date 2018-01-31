@@ -5,6 +5,29 @@ The Netsil AOC CLI is a handy tool for operators to manage common tasks related 
 - Run a query to pull in specific metrics 
 - Create a Netsil map and navigate it to understand dependencies 
 
+## Dockerized Setup
+You can run the CLI through docker as well.
+First, build it with
+
+```bash
+TAG=<your-tag> ./docker-build.sh
+```
+
+The default tag is `netsil/cli`
+
+Then, run it like so:
+
+```bash
+$ docker run -t netsil/cli
+Usage: netsil [OPTIONS] COMMAND [ARGS]...
+
+  Netsil AOC CLI
+
+Options:
+  --help  Show this message and exit.
+...
+```
+
 ## CLI Setup on Mac
 Following steps have been tested on macOS 10.12
 ``` bash 
