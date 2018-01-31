@@ -1,0 +1,6 @@
+virtualenv
+Click
+requests
+pypeg2
+pytz
+networkx
