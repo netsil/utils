@@ -7,10 +7,11 @@ The Netsil AOC CLI is a handy tool for operators to manage common tasks related 
 
 ## Dockerized Setup
 You can run the CLI through docker as well.
+
 First, build it with
 
 ```bash
-TAG=<your-tag> ./docker-build.sh
+$ your-machine $ TAG=<your-tag> ./docker-build.sh
 ```
 
 The default tag is `netsil/cli`
