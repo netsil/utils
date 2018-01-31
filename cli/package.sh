@@ -1,3 +1,4 @@
+pip install -r requirements.txt
 pip install Click
 pip install requests
 pip install --editable .
