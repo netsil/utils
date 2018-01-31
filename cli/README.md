@@ -11,7 +11,7 @@ You can run the CLI through docker as well.
 First, build it with
 
 ```bash
-$ your-machine $ TAG=<your-tag> ./docker-build.sh
+$ TAG=<your-tag> ./docker-build.sh
 ```
 
 The default tag is `netsil/cli`
